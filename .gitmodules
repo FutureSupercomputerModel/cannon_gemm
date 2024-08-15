@@ -1,0 +1,3 @@
+[submodule "calculon"]
+	path = calculon
+	url = https://github.com/FutureSupercomputerModel/calculon.git
