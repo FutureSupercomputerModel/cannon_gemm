@@ -3,3 +3,5 @@ __pycache__
 *.pdf
 *.csv
 logs*
+*_results
+fig*

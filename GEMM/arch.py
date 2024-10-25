@@ -110,9 +110,13 @@ class Arch(Arch_base):
     
     def cannon_gemm(self, m_in,k_in,n_in,debug:bool, general_tiling):
         m,k,n,m_leaf,k_leaf,n_leaf = self.spatial_tile_gemm(m_in,k_in,n_in,debug)
-        T_prep_A = self.ns_setup_interconnect + max(m*k/self.p/self.mesh_bw, m*k/self.p/self.child_arch.buffer_bw)#time to set up connection + max ( time for interconnect send, time for child buffer receive)
-        T_prep_B = self.ns_setup_interconnect + max(k*n/self.p/self.mesh_bw, k*n/self.p/self.child_arch.buffer_bw)
-        T_prep = max(T_prep_A+T_prep_B, (m*k+k*n)/self.buffer_bw )#time to load A and B, potentially bound by dram bandwidth
+       
+        if(self.p>1): 
+            T_prep_A = self.ns_setup_interconnect + max(m*k/self.p/self.mesh_bw, m*k/self.p/self.child_arch.buffer_bw)#time to set up connection + max ( time for interconnect send, time for child buffer receive)
+            T_prep_B = self.ns_setup_interconnect + max(k*n/self.p/self.mesh_bw, k*n/self.p/self.child_arch.buffer_bw)
+            T_prep = max(T_prep_A+T_prep_B, (m*k+k*n)/self.buffer_bw )#time to load A and B, potentially bound by dram bandwidth
+        else:
+            T_prep = (m*k+k*n)/self.buffer_bw
         T_child, E_child = self.child_arch.get_gemm_latency_energy(m_leaf, k_leaf, n_leaf, debug, general_tiling)
         T_compute = self.mesh_dim * T_child
         E_compute = self.mesh_dim * self.p * E_child
@@ -139,6 +143,7 @@ class Arch(Arch_base):
         bits_perp_interconnect = self.mesh_dim * (1+self.mesh_dim) * self.bytes_per_element * 8.0 * (m_leaf*k_leaf + k_leaf*n_leaf)/2.0
         E_prep_interconnect = bits_perp_interconnect * self.mesh_nJ_per_bit 
         E_prep = E_prep_buffer_read + E_prep_child_buffer_write + E_prep_interconnect
+        # print(E_prep_buffer_read, E_prep_child_buffer_write, E_prep_interconnect)
         bits_send = self.mesh_dim * self.p * (m_leaf*k_leaf + k_leaf*n_leaf) * self.bytes_per_element * 8.0
         E_send_child_buffer = bits_send * self.child_arch.buffer_nJ_per_bit * 2
         E_send_interconnect = bits_send * self.mesh_nJ_per_bit
@@ -303,14 +308,19 @@ def top_level_gemm(m,k,n, arch: Arch, debug:bool, general_tiling=True):
     while arch_copy.child_arch is not None:
         arch_copy = arch_copy.child_arch
         log[f"Level {arch_copy.level} logs"] = arch_copy.log.to_dict() 
-    log = json.dumps(log, indent=4)
+    
     if debug:
         
         print("----------------Accumulated Logs------------------")
         arch.print_log()
+        leaf_arch = arch
+        while leaf_arch.child_arch is not None:
+            leaf_arch = leaf_arch.child_arch
+        print(f"E_compute: {log['Level 0 logs']['mac']*leaf_arch.nJ_per_mac*1e-9}J")
         print("----------------Top Level GEMM------------------")
         print(f"s for top level GEMM: {T_top}")
         print(f"J for top level GEMM: {E_total}")
         print("=====================================")
-    return T_top*1e-9, E_total*1e-9, log
+    log = json.dumps(log, indent=4)
+    return T_top, E_total, log
     

@@ -1,0 +1,46 @@
+from GEMM.arch import Arch
+from GEMM.leaf import Leaf
+from GEMM.arch import top_level_gemm
+
+leaf_cryo = Leaf(pe_arr_dim=128.0*4, 
+                      buffer_size=f'{256}MB', 
+                      buffer_bw = f'{9680}GBps', 
+                      pe_freq=4.0, 
+                      E_per_mac="2.27pJ", 
+                      interconnect_E_per_bit="0.1pJ", 
+                      buffer_E_per_bit='2.75fJ', 
+                      bytes_per_element=2,
+                      buffer_bit_area=0.058,
+                      mac_area=550,
+                      is3d=True)
+blade_cryo = Arch(mesh_dim=4.0, 
+                  mesh_bw=f'{9680}GBps', 
+                  buffer_size="80GB", 
+                  buffer_bw='30.0TBps', 
+                  mesh_E_per_bit='0.1pJ', 
+                  buffer_E_per_bit=f'{22*0.029}pJ', 
+                  child_arch=leaf_cryo)
+node_cryo = Arch(mesh_dim=1.0, 
+                 mesh_bw='1PBps', 
+                 buffer_size="8TB", 
+                 buffer_bw='3.0PBps', 
+                 mesh_E_per_bit='0.1pJ', 
+                 buffer_E_per_bit=f'{22*0.029}pJ', 
+                 child_arch=blade_cryo)
+gemm_sizes = [
+    (819, 819, 819),
+    # (409600, 409600, 409600),
+    # (204800, 204800, 204800),
+    # (102400, 102400, 102400),
+    # (51200, 51200, 51200),
+    # (25600, 25600, 25600),
+    # (12800, 12800, 12800),
+    # (6400, 6400, 6400),
+    # (3200, 3200, 3200),
+    # (1600, 1600, 1600),
+    # (800, 800, 800),
+    # (400, 400, 400),
+    # (200, 200, 200)
+]
+for m,k,n in gemm_sizes:
+    top_level_gemm(m,k,n, node_cryo, debug=True, general_tiling=True)

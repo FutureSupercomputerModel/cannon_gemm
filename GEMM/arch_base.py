@@ -19,7 +19,7 @@ class Log:
         self.T_send *= num_iter
         self.T_store *= num_iter
     def toString(self):
-        return f"T_prep: {self.T_prep}, T_compute: {self.T_compute}, T_send: {self.T_send}, T_store: {self.T_store}, buffer_access: {self.buffer_access}, interconnect_bits: {self.interconnect_bits}, mac: {self.mac}"
+        return f"T_prep(s): {self.T_prep*1E-9}, T_compute(s): {self.T_compute*1E-9}, T_send(s): {self.T_send*1E-9}, T_store(s): {self.T_store*1E-9}, buffer_access: {self.buffer_access}, interconnect_bits: {self.interconnect_bits}, mac: {self.mac}"
     def to_dict(self):
         return {
             "T_prep": self.T_prep,

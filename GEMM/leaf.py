@@ -17,7 +17,7 @@ class Leaf(Arch_base):
     # min_gemm_size = pe_arr_dim
     # buffer_bw = buffer_width*buffer_freq/8.0 #bytes per ns
 
-    def __init__(self, pe_arr_dim:float, buffer_size:str, buffer_bw:str, pe_freq:float, E_per_mac:float, interconnect_E_per_bit:float, buffer_E_per_bit:float, bytes_per_element:int, buffer_bit_area:float, mac_area:float) -> None:
+    def __init__(self, pe_arr_dim:float, buffer_size:str, buffer_bw:str, pe_freq:float, E_per_mac:float, interconnect_E_per_bit:float, buffer_E_per_bit:float, bytes_per_element:int, buffer_bit_area:float, mac_area:float, is3d=False) -> None:
         self.pe_arr_dim = pe_arr_dim
         self.buffer_size_bytes = str2bytes(buffer_size)
         self.buffer_size_elems = self.buffer_size_bytes/bytes_per_element
@@ -35,9 +35,15 @@ class Leaf(Arch_base):
         self.level = 0
         self.log = Log()
 
-        self.buffer_area = self.buffer_size_bytes*buffer_bit_area
+        self.buffer_area = self.buffer_size_bytes*8*buffer_bit_area
         self.mac_area = self.pe_arr_dim*self.pe_arr_dim*mac_area
-        self.total_chip_area = max(self.buffer_area, self.mac_area)
+        sram_layers = 5.0
+        compute_layers = 1.0
+        if is3d:
+            self.total_chip_area = max(self.mac_area/compute_layers, self.buffer_area/sram_layers)
+        else:
+            self.total_chip_area = (self.mac_area + self.buffer_area)/0.54
+        
     
     def to_dict(self):
         return {
