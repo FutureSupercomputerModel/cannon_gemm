@@ -132,7 +132,7 @@ class Arch(Arch_base):
         T_store = self.ns_setup_interconnect+max(m*n/self.buffer_bw, m*n/self.p/self.child_arch.buffer_bw)
         
         if self.roofline:
-            latency = max(T_prep, T_compute, T_send, T_store)
+            latency = max(T_prep+T_store, T_compute, T_send)
         else:
             latency = T_prep + T_compute + T_send + T_store
             
@@ -322,5 +322,8 @@ def top_level_gemm(m,k,n, arch: Arch, debug:bool, general_tiling=True):
         print(f"J for top level GEMM: {E_total}")
         print("=====================================")
     log = json.dumps(log, indent=4)
-    return T_top, E_total, log
+    T_memory = (arch.log.T_prep + arch.log.T_store)*1E-9
+    T_communication = arch.log.T_send*1E-9
+    T_compute = arch.log.T_compute*1E-9
+    return T_top, E_total, T_memory, T_communication, T_compute, log
     
