@@ -29,9 +29,9 @@ imec_node = Arch(mesh_dim=1.0,
                 child_arch=imec_blade)
 
 # m,k,n = (90,90,90)
-m,k,n = (37800.0, 37800.0, 37800.0)
+m,k,n = (8192*64, 8192*64, 8192*64)
 # m,k,n = 90*200*64,90*200*64,90*200*64
-time, energy, t_memory, t_communication, t_compute, log = top_level_gemm(m,k,n, imec_blade, debug=True, general_tiling=True)
+time, energy, t_memory, t_communication, t_compute, log = top_level_gemm(m,k,n, imec_node, debug=True, general_tiling=True)
 print(f"Time: {time} s")
 print(f"Energy: {energy} J")
 print(f"Time_memory: {t_memory} s")

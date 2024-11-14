@@ -59,7 +59,9 @@ def GBps2str(bw):
         return f"{bw/1024/1024/1024}PBps"
 
 def str2energy(energy_string):
-    if 'fJ' in energy_string:
+    if 'aJ' in energy_string:
+        energy = float(energy_string[:-2]) / 1000000000
+    elif 'fJ' in energy_string:
         energy = float(energy_string[:-2]) / 1000000
     elif 'pJ' in energy_string:
         energy = float(energy_string[:-2]) / 1000
