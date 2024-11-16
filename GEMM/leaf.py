@@ -28,6 +28,7 @@ class Leaf(Arch_base):
         self.interconnect_nJ_per_bit = str2energy(interconnect_E_per_bit)
         self.buffer_nJ_per_bit = str2energy(buffer_E_per_bit)
         self.bytes_per_element = bytes_per_element
+        self.total_static_W = 0
 
 
         self.min_gemm_size = self.pe_arr_dim
@@ -91,6 +92,9 @@ class Leaf(Arch_base):
         self.log.mac += M*K*N
         self.log.buffer_access += buffer_access_bits
         self.log.interconnect_bits += buffer_access_bits
+        self.log.buffer_E_nJ += self.log.buffer_access * self.buffer_nJ_per_bit
+        self.log.interconnect_E_nJ += self.log.interconnect_bits * self.interconnect_nJ_per_bit
+        self.log.mac_E_nJ += self.log.mac * self.nJ_per_mac
         self.log.T_prep += (M*K+K*N)/self.buffer_bw
         self.log.T_compute += compute_time
         self.log.T_send += 0

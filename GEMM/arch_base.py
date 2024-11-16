@@ -4,6 +4,10 @@ class Log:
         self.buffer_access = 0
         self.interconnect_bits = 0
         self.mac = 0
+        self.buffer_E_nJ = 0
+        self.interconnect_E_nJ = 0
+        self.mac_E_nJ = 0
+        self.down_up_link_E_nJ = 0
         self.T_prep = 0
         self.T_compute = 0
         self.T_send = 0
@@ -13,6 +17,10 @@ class Log:
         self.buffer_access *= num_iter
         self.interconnect_bits *= num_iter
         self.mac *= num_iter
+        self.buffer_E_nJ *= num_iter
+        self.interconnect_E_nJ *= num_iter
+        self.mac_E_nJ *= num_iter
+        self.down_up_link_E_nJ *= num_iter
     def update_latency(self, num_iter):
         self.T_prep *= num_iter
         self.T_compute *= num_iter
@@ -28,7 +36,11 @@ class Log:
             "T_store": self.T_store,
             "buffer_access": self.buffer_access,
             "interconnect_bits": self.interconnect_bits,
-            "mac": self.mac
+            "mac": self.mac,
+            "buffer_E_nJ": self.buffer_E_nJ,
+            "interconnect_E_nJ": self.interconnect_E_nJ,
+            "mac_E_nJ": self.mac_E_nJ,
+            "down_up_link_E_nJ": self.down_up_link_E_nJ
         }
 class Arch_base:
     child_arch=None

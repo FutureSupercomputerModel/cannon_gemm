@@ -88,3 +88,37 @@ def energy2str(energy):
         return f"{energy/1000000}mJ"
     else:
         return f"{energy/1000000000}J"
+
+#returns W from string representation of power
+def str2power(power):
+    if 'aW' in power:
+        power = float(power[:-2]) / 1E18
+    elif 'fW' in power:
+        power = float(power[:-2]) / 1E15
+    elif 'pW' in power:
+        power = float(power[:-2]) / 1E12
+    elif 'nW' in power:
+        power = float(power[:-2]) / 1E9
+    elif 'uW' in power:
+        power = float(power[:-2]) / 1E6
+    elif 'mW' in power:
+        power = float(power[:-2]) / 1E3
+    elif 'W' in power:
+        power = float(power[:-1])
+    return power
+
+def power2str(power):
+    if power < 1E-15:
+        return f"{power*1E18}aW"
+    elif power < 1E-12:
+        return f"{power*1E15}fW"
+    elif power < 1E-9:
+        return f"{power*1E12}pW"
+    elif power < 1E-6:
+        return f"{power*1E9}nW"
+    elif power < 1E-3:
+        return f"{power*1E6}uW"
+    elif power < 1:
+        return f"{power*1E3}mW"
+    else:
+        return f"{power}W"

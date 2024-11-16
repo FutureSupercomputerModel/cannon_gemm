@@ -62,7 +62,7 @@ def exp_normalize_area():
                     child_arch=tpuv1_blade)
     tpuv1_node.peak_power = 75*tpuv1_node.mesh_dim*tpuv1_node.mesh_dim
 
-
+#361=sqrt(128*128*4*2)
     tpuv4_leaf = Leaf(pe_arr_dim=361.0, 
                         buffer_size=f'{128}MB', 
                         buffer_bw = f'{362*2*8/8*1.05}GBps', 

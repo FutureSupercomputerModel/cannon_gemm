@@ -26,7 +26,7 @@ class Arch(Arch_base):
 
 
     def __init__(self, mesh_dim:float, mesh_bw:str, buffer_size:str, buffer_bw:str, 
-                 mesh_E_per_bit:float, buffer_E_per_bit:float, 
+                 mesh_E_per_bit:float, buffer_E_per_bit:float, buffer_static_W_per_bit:float, sc_to_cryo_E_per_bit:float, cryo_to_sc_E_per_bit:float,
                  child_arch:Arch_base,
                  ns_setup_interconnect:float=0,
                  roofline:bool=True,
@@ -41,6 +41,11 @@ class Arch(Arch_base):
         #tech params
         self.mesh_nJ_per_bit = str2energy(mesh_E_per_bit)
         self.buffer_nJ_per_bit = str2energy(buffer_E_per_bit)
+        self.buffer_static_W_per_bit = str2power(buffer_static_W_per_bit)
+        self.buffer_static_W = self.buffer_static_W_per_bit*self.buffer_size_bytes*8.0
+        self.total_static_W = self.buffer_static_W + child_arch.total_static_W * mesh_dim * mesh_dim
+        self.sc_to_cryo_E_per_bit = str2energy(sc_to_cryo_E_per_bit)
+        self.cryo_to_sc_E_per_bit = str2energy(cryo_to_sc_E_per_bit)
 
         self.ns_setup_interconnect = ns_setup_interconnect
 
@@ -66,9 +71,11 @@ class Arch(Arch_base):
             "buffer_bw": GBps2str(self.buffer_bw_GBps),
             "mesh_E_per_bit": energy2str(self.mesh_nJ_per_bit),
             "buffer_E_per_bit": energy2str(self.buffer_nJ_per_bit),
+            "buffer_static_W_per_bit": power2str(self.buffer_static_W_per_bit),
             "ns_setup_interconnect": self.ns_setup_interconnect,
             "roofline": self.roofline,
             "total_chip_area": f"{self.total_chip_area/1e8}cm^2",
+            "total_static_power": self.total_static_W,
             "level": self.level,
             "child_arch": self.child_arch.to_dict()
         }
@@ -138,7 +145,8 @@ class Arch(Arch_base):
             
         #energy
         bits_prep_buffer_read = (m_leaf*k_leaf+k_leaf*n_leaf)*self.p*self.bytes_per_element*8.0
-        E_prep_buffer_read = bits_prep_buffer_read * self.buffer_nJ_per_bit
+        E_uplink = bits_prep_buffer_read * self.cryo_to_sc_E_per_bit
+        E_prep_buffer_read = bits_prep_buffer_read * self.buffer_nJ_per_bit + E_uplink 
         E_prep_child_buffer_write = bits_prep_buffer_read * self.child_arch.buffer_nJ_per_bit
         bits_perp_interconnect = self.mesh_dim * (1+self.mesh_dim) * self.bytes_per_element * 8.0 * (m_leaf*k_leaf + k_leaf*n_leaf)/2.0
         E_prep_interconnect = bits_perp_interconnect * self.mesh_nJ_per_bit 
@@ -149,12 +157,17 @@ class Arch(Arch_base):
         E_send_interconnect = bits_send * self.mesh_nJ_per_bit
         E_send = E_send_child_buffer + E_send_interconnect
         bits_store = m_leaf*n_leaf*self.p*self.bytes_per_element*8.0
-        E_store = bits_store * (self.buffer_nJ_per_bit+self.mesh_nJ_per_bit)
-        E_total = E_prep + E_compute + E_send
+        E_downlink = bits_store * self.sc_to_cryo_E_per_bit
+        E_store = bits_store * (self.buffer_nJ_per_bit + self.mesh_nJ_per_bit) + E_downlink
+        E_total = E_prep + E_compute + E_send + E_store
 
         #update logs
         self.log.buffer_access += bits_prep_buffer_read + bits_store
         self.log.interconnect_bits += bits_prep_buffer_read + bits_perp_interconnect + bits_send + bits_store
+        self.log.buffer_E_nJ += self.log.buffer_access * self.buffer_nJ_per_bit
+        self.log.interconnect_E_nJ += self.log.interconnect_bits * self.mesh_nJ_per_bit
+        self.log.mac_E_nJ = 0
+        self.log.down_up_link_E_nJ += E_downlink + E_uplink
         self.child_arch.update_data_transfer_log_recursively(self.mesh_dim*self.p)
         self.log.T_prep += T_prep
         self.log.T_compute += T_compute
@@ -286,8 +299,7 @@ class Arch(Arch_base):
 # # cmos_arch_ideal = arch.Arch(buffer_bw=64.0*90.0*2, ns_setup_interconnect=1.0, mesh_bw=64.0*3, mesh_H=90.0, mesh_W=90.0, pe_arr_H=200.0, pe_arr_W=200.0, pe_freq=4.0, buffer_size=20.0*1024*1024)
 # imec_arch = Arch(buffer_bw=1000000, ns_setup_interconnect=1.0, mesh_bw=200.0*30.0, mesh_dim=90.0, pe_arr_dim=200.0, pe_freq=30.0, buffer_size=20.0*1024*1024, buffer_bw=200*30.0*3)
 
-
-#return time in s and energy in J
+#return T_top(s), E_total(J), T_memory(s), T_communication(s), T_compute(s), log
 def top_level_gemm(m,k,n, arch: Arch, debug:bool, general_tiling=True):
     arch.reset_log()
     if debug:
@@ -298,17 +310,31 @@ def top_level_gemm(m,k,n, arch: Arch, debug:bool, general_tiling=True):
     T_top, E_total=arch.get_gemm_latency_energy(m, k, n, debug, general_tiling)
     T_top *= 1e-9
     E_total *= 1e-9
+    E_total += arch.total_static_W * T_top
     log = {
-        "arch": arch.to_dict(),
-        "T_top": T_top,
-        "E_total": E_total
+        "arch": arch.to_dict()
     }
     log[f"Level {arch.level} logs"] = arch.log.to_dict()
+    E_interconnect = arch.log.interconnect_E_nJ
+    E_compute = arch.log.mac_E_nJ
+    E_memory = arch.log.buffer_E_nJ
+    E_SC_cryo_interface = arch.log.down_up_link_E_nJ
     arch_copy = copy.deepcopy(arch)
     while arch_copy.child_arch is not None:
         arch_copy = arch_copy.child_arch
         log[f"Level {arch_copy.level} logs"] = arch_copy.log.to_dict() 
-    
+        E_interconnect += arch_copy.log.interconnect_E_nJ
+        E_compute += arch_copy.log.mac_E_nJ
+        E_memory += arch_copy.log.buffer_E_nJ
+        E_SC_cryo_interface += arch_copy.log.down_up_link_E_nJ
+    log["T_top"] = T_top
+    log["E_total"] = E_total
+    log["E_dynamic"] = E_total - arch.total_static_W * T_top
+    log["E_static"] = arch.total_static_W * T_top
+    log["E_interconnect"] = E_interconnect * 1e-9
+    log["E_compute"] = E_compute* 1e-9
+    log["E_memory"] = E_memory* 1e-9
+    log["E_SC_cryo_interface"] = E_SC_cryo_interface* 1e-9
     if debug:
         
         print("----------------Accumulated Logs------------------")
