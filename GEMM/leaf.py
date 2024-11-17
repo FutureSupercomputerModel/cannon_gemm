@@ -1,7 +1,7 @@
-from GEMM.arch_base import Arch_base, Log
-from Leaf_Modeling.src.leaf_interface import run_leaf_modeling
+from cannon_gemm.GEMM.arch_base import Arch_base, Log
+from cannon_gemm.Leaf_Modeling.src.leaf_interface import run_leaf_modeling
 import math
-from helper.myMath import *
+from cannon_gemm.helper.myMath import *
 class Leaf(Arch_base):
     # pe_arr_dim = 200.0
     # buffer_size = 20.0*1024*1024 #20MB

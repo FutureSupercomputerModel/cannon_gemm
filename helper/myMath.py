@@ -122,3 +122,23 @@ def power2str(power):
         return f"{power*1E3}mW"
     else:
         return f"{power}W"
+
+# Calculon helper 
+def convert_to_bytes(size_str):
+    # Dictionary of unit multipliers
+    unit_multipliers = {
+        'B': 1,
+        'KB': 1024,
+        'MB': 1024**2,
+        'GB': 1024**3,
+        'TB': 1024**4,
+        'PB': 1024**5
+    }
+    # Extract number and unit from the string
+    size = float(''.join([c for c in size_str if c.isdigit() or c == '.']))
+    unit = ''.join([c for c in size_str if c.isalpha()]).upper()
+    # Multiply the size by the corresponding unit multiplier
+    if unit in unit_multipliers:
+        return size * unit_multipliers[unit]
+    else:
+        raise ValueError(f"Unknown unit '{unit}' in size string '{size_str}'")
