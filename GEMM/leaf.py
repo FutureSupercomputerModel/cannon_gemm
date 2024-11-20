@@ -76,15 +76,68 @@ class Leaf(Arch_base):
     
     def print_log(self):
         self.debugprint(self.log.toString())
-    #energy in nJ, time in ns
-    def run_leaf_modeling_fallback(self, M, K, N, debug=False):
-        compute_time = M*K*N/self.pe_arr_dim/self.pe_arr_dim/self.pe_freq
-        buffer_time = (M*K+K*N+M*N)/self.buffer_bw
-        time = max(compute_time, buffer_time)
+
+    def OutputStationary(self, m,n,K,cycle_time, bw):
+        t_compute = (2*m + n + K - 2)*cycle_time
+        t_load = (m*K+K*n)/bw
+        t_store = m*n/bw
+        t_total = max(t_compute, t_load + t_store)
+        load_elems = m*K+K*n
+        store_elems = m*n
+        load_store_elems = load_elems + store_elems
+        return t_total, t_compute, t_load, t_store, load_store_elems
+    def scale_sim_systolic(self, M,K,N, debug):
+        
+
+        bw = self.buffer_bw
+        d = self.pe_arr_dim
+        cycle_time = 1/self.pe_freq
+        if M > d and N > d:
+            m = M%d
+            n = N%d
+
+            t_DD, t_DD_compute, t_DD_load, t_DD_store, DD_elems = self.OutputStationary(d,d,K,cycle_time, bw)
+            t_Dn, t_Dn_compute, t_Dn_load, t_Dn_store, Dn_elems = self.OutputStationary(d,n,K,cycle_time, bw)
+            t_mD, t_mD_compute, t_mD_load, t_mD_store, mD_elems = self.OutputStationary(m,d,K,cycle_time, bw)
+            t_mn, t_mn_compute, t_mn_load, t_mn_store, mn_elems = self.OutputStationary(m,n,K,cycle_time, bw)
             
-        # energy = (M*K*N*self.nJ_per_mac + (M*K+K*N+M*N)*(self.interconnect_nJ_per_bit + self.buffer_nJ_per_bit))
+            T_total = math.floor(M/d)*math.floor(N/d)*t_DD + math.floor(M/d)*t_Dn + math.floor(N/d)*t_mD + t_mn
+            T_compute = math.floor(M/d)*math.floor(N/d)*t_DD_compute + math.floor(M/d)*t_Dn_compute + math.floor(N/d)*t_mD_compute + t_mn_compute
+            T_load = math.floor(M/d)*math.floor(N/d)*t_DD_load + math.floor(M/d)*t_Dn_load + math.floor(N/d)*t_mD_load + t_mn_load
+            T_store = math.floor(M/d)*math.floor(N/d)*t_DD_store + math.floor(M/d)*t_Dn_store + math.floor(N/d)*t_mD_store + t_mn_store
+
+            elems_accessed = math.floor(M/d)*math.floor(N/d)*DD_elems + math.floor(M/d)*Dn_elems + math.floor(N/d)*mD_elems + mn_elems
+
+        elif M > d:
+            m = M%d
+            t_DN, t_DN_compute, t_DN_load, t_DN_store, DN_elems = self.OutputStationary(d,N,K,cycle_time, bw)
+            t_mN, t_mN_compute, t_mN_load, t_mN_store, mN_elems = self.OutputStationary(m,N,K,cycle_time, bw)
+            T_total = math.floor(M/d)*t_DN + t_mN
+            T_compute = math.floor(M/d)*t_DN_compute + t_mN_compute
+            T_load = math.floor(M/d)*t_DN_load + t_mN_load
+            T_store = math.floor(M/d)*t_DN_store + t_mN_store
+            elems_accessed = math.floor(M/d)*DN_elems + mN_elems
+        
+        elif N > d:
+            n = N%d
+            t_MD, t_MD_compute, t_MD_load, t_MD_store, MD_elems = self.OutputStationary(M,d,K,cycle_time, bw)
+            t_Mn, t_Mn_compute, t_Mn_load, t_Mn_store, Mn_elems = self.OutputStationary(M,n,K,cycle_time, bw)
+            T_total = math.floor(N/d)*t_MD + t_Mn
+            T_compute = math.floor(N/d)*t_MD_compute + t_Mn_compute
+            T_load = math.floor(N/d)*t_MD_load + t_Mn_load
+            T_store = math.floor(N/d)*t_MD_store + t_Mn_store
+            elems_accessed = math.floor(N/d)*MD_elems + Mn_elems
+           
+        else:
+            t_MN, t_MN_compute, t_MN_load, t_MN_store, MN_elems = self.OutputStationary(M,N,K,cycle_time, bw)
+            T_total = t_MN
+            T_compute = t_MN_compute
+            T_load = t_MN_load
+            T_store = t_MN_store
+            elems_accessed = MN_elems
+
         compute_energy = M*K*N*self.nJ_per_mac
-        buffer_access_bits = (M*K+K*N+M*N)*self.bytes_per_element*8
+        buffer_access_bits = elems_accessed*self.bytes_per_element*8
         buffer_energy = buffer_access_bits*(self.interconnect_nJ_per_bit + self.buffer_nJ_per_bit)
         energy = compute_energy + buffer_energy
 
@@ -92,22 +145,58 @@ class Leaf(Arch_base):
         self.log.mac += M*K*N
         self.log.buffer_access += buffer_access_bits
         self.log.interconnect_bits += buffer_access_bits
-        self.log.buffer_E_nJ += self.log.buffer_access * self.buffer_nJ_per_bit
-        self.log.interconnect_E_nJ += self.log.interconnect_bits * self.interconnect_nJ_per_bit
-        self.log.mac_E_nJ += self.log.mac * self.nJ_per_mac
-        self.log.T_prep += (M*K+K*N)/self.buffer_bw
-        self.log.T_compute += compute_time
+        self.log.buffer_E_nJ += buffer_access_bits * self.buffer_nJ_per_bit
+        self.log.interconnect_E_nJ += buffer_access_bits * self.interconnect_nJ_per_bit
+        self.log.mac_E_nJ += M*K*N * self.nJ_per_mac
+        self.log.T_prep += T_load
+        self.log.T_compute += T_compute
         self.log.T_send += 0
-        self.log.T_store += M*N/self.buffer_bw
+        self.log.T_store += T_store
+
         if debug:
             self.debugprint("------------------GEMM------------------")
             self.debugprint(f"GEMM: {M},{K},{N}")
-            self.debugprint(f"latency: {time}, T_compute: {compute_time}, T_buffer: {buffer_time}")
+            self.debugprint(f"latency: {T_total}, T_compute: {T_compute}, T_buffer: {T_load+T_store}")
             self.debugprint(f"energy: {energy2str(energy)}, E_compute: {energy2str(compute_energy)}, E_buffer: {energy2str(buffer_energy)}")
             self.debugprint(f"buffer load store bits: {buffer_access_bits}")
             self.debugprint(f"interconnect transfer bits: {buffer_access_bits}")
         
+        return energy, T_total
+    #energy in nJ, time in ns
+    def run_leaf_modeling_fallback(self, M, K, N, debug=False):
+        
+        energy, time = self.scale_sim_systolic(M,K,N, debug)
         return energy, time
+        # compute_time = M*K*N/self.pe_arr_dim/self.pe_arr_dim/self.pe_freq
+        # buffer_time = (M*K+K*N+M*N)/self.buffer_bw
+        # time = max(compute_time, buffer_time)
+            
+        # # energy = (M*K*N*self.nJ_per_mac + (M*K+K*N+M*N)*(self.interconnect_nJ_per_bit + self.buffer_nJ_per_bit))
+        # compute_energy = M*K*N*self.nJ_per_mac
+        # buffer_access_bits = (M*K+K*N+M*N)*self.bytes_per_element*8
+        # buffer_energy = buffer_access_bits*(self.interconnect_nJ_per_bit + self.buffer_nJ_per_bit)
+        # energy = compute_energy + buffer_energy
+
+        # #update logs
+        # self.log.mac += M*K*N
+        # self.log.buffer_access += buffer_access_bits
+        # self.log.interconnect_bits += buffer_access_bits
+        # self.log.buffer_E_nJ += self.log.buffer_access * self.buffer_nJ_per_bit
+        # self.log.interconnect_E_nJ += self.log.interconnect_bits * self.interconnect_nJ_per_bit
+        # self.log.mac_E_nJ += self.log.mac * self.nJ_per_mac
+        # self.log.T_prep += (M*K+K*N)/self.buffer_bw
+        # self.log.T_compute += compute_time
+        # self.log.T_send += 0
+        # self.log.T_store += M*N/self.buffer_bw
+        # if debug:
+        #     self.debugprint("------------------GEMM------------------")
+        #     self.debugprint(f"GEMM: {M},{K},{N}")
+        #     self.debugprint(f"latency: {time}, T_compute: {compute_time}, T_buffer: {buffer_time}")
+        #     self.debugprint(f"energy: {energy2str(energy)}, E_compute: {energy2str(compute_energy)}, E_buffer: {energy2str(buffer_energy)}")
+        #     self.debugprint(f"buffer load store bits: {buffer_access_bits}")
+        #     self.debugprint(f"interconnect transfer bits: {buffer_access_bits}")
+        
+        # return energy, time
     
     def get_gemm_latency_energy(self, M:int, K:int, N:int, debug:bool, general_tiling:bool):
         # M = math.ceil(M/(self.min_gemm_size)) * self.min_gemm_size
