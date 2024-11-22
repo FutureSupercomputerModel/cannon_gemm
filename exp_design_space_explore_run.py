@@ -11,17 +11,25 @@ DEBUG = True
 
 class Sys_arch:
     def __init__(self, leaf_pe_arr_dim,\
-              blade_mesh_dim,\
+                 leaf_sram_size,\
+                blade_mesh_dim,\
+                blade_dram_bw,\
                 node_mesh_dim,\
+                blade_dram_size,\
                 label=None):
-        self.leaf_pe_arr_dim = leaf_pe_arr_dim
-        self.blade_mesh_dim = blade_mesh_dim
+        self.leaf_pe_arr_dim = leaf_pe_arr_dim #var3
+        self.leaf_sram_size = leaf_sram_size #according to var3
+        self.blade_mesh_dim = blade_mesh_dim #var1
+        self.blade_dram_bw = blade_dram_bw
         self.node_mesh_dim = node_mesh_dim
+        self.blade_dram_size = blade_dram_size #var2
         self.label = label
     def cannon_gemm(self, m, k, n, debug=False):
         imec_leaf = Leaf(pe_arr_dim=self.leaf_pe_arr_dim, 
-                        buffer_size=f"{self.leaf_pe_arr_dim*self.leaf_pe_arr_dim/200.0/200*20}MB", 
-                        buffer_bw = f'{self.leaf_pe_arr_dim*self.leaf_pe_arr_dim/200.0/200*73.34}TBps',
+                        # buffer_size=f"{self.leaf_pe_arr_dim*self.leaf_pe_arr_dim/200.0/200*20}MB", 
+                        buffer_size=f"{self.leaf_sram_size}MB", 
+                        # buffer_bw = f'{self.leaf_pe_arr_dim*self.leaf_pe_arr_dim/200.0/200*73.34}TBps',
+                        buffer_bw = f'{73.34}TBps',
                         pe_freq=30.0, 
                         E_per_mac='14fJ', 
                         interconnect_E_per_bit='0.00001pJ', 
@@ -31,30 +39,49 @@ class Sys_arch:
                         mac_area=3600,
                         is3d=True)
         imec_blade = Arch(mesh_dim=self.blade_mesh_dim, 
-                    mesh_bw=f'{self.leaf_pe_arr_dim*self.leaf_pe_arr_dim/200.0/200*73.34}TBps', 
-                    buffer_size=f"{80/self.node_mesh_dim/self.node_mesh_dim*8*8}GB", 
-                    buffer_bw=f'{30.0/self.node_mesh_dim/self.node_mesh_dim*8*8}TBps', 
+                    # mesh_bw=f'{self.leaf_pe_arr_dim*self.leaf_pe_arr_dim/200.0/200*73.34}TBps', 
+                    mesh_bw=f'{73.34}TBps', 
+                    buffer_size=f"{self.blade_dram_size}GB", 
+                    buffer_bw=f'{self.blade_dram_bw}TBps', 
                     mesh_E_per_bit='5e-4pJ', 
-                    buffer_E_per_bit=f'{22*0.029}pJ', 
+                    buffer_E_per_bit=f'{22*0.029}pJ',
+                    buffer_static_W_per_bit=f'{22*1.33}pW',
+                    sc_to_cryo_E_per_bit="0.4pJ",
+                    cryo_to_sc_E_per_bit="4.24pJ", 
                     child_arch=imec_leaf)
         imec_node = Arch(mesh_dim=self.node_mesh_dim, 
                     mesh_bw='1PBps', 
                     buffer_size="8TB", 
                     buffer_bw='3.0PBps', 
                     mesh_E_per_bit='5e-3pJ', 
-                    buffer_E_per_bit=f'{22*0.029}pJ', 
+                    buffer_E_per_bit=f'{0}pJ', 
+                    buffer_static_W_per_bit=f'{0}pW',
+                    sc_to_cryo_E_per_bit="0pJ",
+                    cryo_to_sc_E_per_bit="0pJ",
                     child_arch=imec_blade)
         T_top, E_total, T_memory, T_communication, T_compute, log = top_level_gemm(m,k,n, imec_node, debug=debug, general_tiling=True)
         return T_top, E_total
 
-sys_arch_list = [Sys_arch(leaf_pe_arr_dim=200, blade_mesh_dim=32.0, node_mesh_dim=2.0, label='c1'),\
-                Sys_arch(leaf_pe_arr_dim=200, blade_mesh_dim=16.0, node_mesh_dim=4.0, label='c2'),\
-                Sys_arch(leaf_pe_arr_dim=200, blade_mesh_dim=8.0, node_mesh_dim=8.0, label='c3'),\
-                Sys_arch(leaf_pe_arr_dim=100, blade_mesh_dim=16.0, node_mesh_dim=8.0, label='c4'),\
-                Sys_arch(leaf_pe_arr_dim=200, blade_mesh_dim=4.0, node_mesh_dim=16.0, label='c5'),\
-                Sys_arch(leaf_pe_arr_dim=100, blade_mesh_dim=8.0, node_mesh_dim=16.0, label='c6'),\
-                Sys_arch(leaf_pe_arr_dim=200, blade_mesh_dim=2.0, node_mesh_dim=32.0, label='c7')
-                        ]
+sys_arch_list = []
+counter = 1
+total_dram_bw = 1920
+for sram_area_ratio in [5/6.0, 4/6.0, 2/6.0]:
+    for total_dram_capacity in [32768, 16384, 65536]:
+        for blade_mesh_dim in [8,4,2]:
+                leaf_pe_arr_dim = math.sqrt(6*(1-sram_area_ratio)*200*200)
+                node_mesh_dim = math.sqrt(8*8/blade_mesh_dim/blade_mesh_dim*8*8)
+                blade_dram_bw = total_dram_bw/node_mesh_dim/node_mesh_dim
+                blade_dram_size = total_dram_capacity/node_mesh_dim/node_mesh_dim
+                leaf_sram_size = 6*sram_area_ratio*4
+                label = f"c{counter}"
+                counter += 1
+        
+                sys_arch_list.append(Sys_arch(leaf_pe_arr_dim=leaf_pe_arr_dim, leaf_sram_size=leaf_sram_size, blade_mesh_dim=blade_mesh_dim, blade_dram_bw=blade_dram_bw, node_mesh_dim=node_mesh_dim, blade_dram_size=blade_dram_size, label=label))
+print(f"number of experiments: {len(sys_arch_list)}")
+#print sys_arch_list to see the list of experiments
+for sys_arch in sys_arch_list:
+    print(f"PE array dim={sys_arch.pe_arr_dim}, SRAM size={sys_arch.sram_size}, blade mesh dim={sys_arch.blade_mesh_dim}, blade dram bw={sys_arch.blade_dram_bw}, blade dram size={sys_arch.blade_dram_size}, node mesh dim={sys_arch.node_mesh_dim} ")
+
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
@@ -83,13 +110,13 @@ print(f"finished all {len(res)} experiments")
 
 with open("data_design_space_explore.csv", "w") as fp:
     writer = csv.writer(fp)
-    writer.writerow(["label", "leaf_pe_arr_dim","blade_mesh_dim","node_mesh_dim","T_top(s)", "E_total(J)"])
+    writer.writerow(["label", "leaf_pe_arr_dim", "leaf_sram_size","blade_mesh_dim","dram_bw_per_blade", "node_mesh_dim","T_top(s)", "E_total(J)"])
     for sys_arch, T_top, E_total in res:
         #for plot
         # list_T = np.append(list_T, T_top)
         # list_E = np.append(list_E, E_total)
         #for dump
-        row=[sys_arch.label, sys_arch.leaf_pe_arr_dim,sys_arch.blade_mesh_dim,sys_arch.node_mesh_dim, T_top, E_total]
+        row=[sys_arch.label, sys_arch.leaf_pe_arr_dim, sys_arch.leaf_sram_size , sys_arch.blade_mesh_dim, sys_arch.node_mesh_dim, T_top, E_total]
         writer.writerow(row)
         data.append(row)
 # with open("cannon_gemm_para_sweep_dumped_data", "w") as fp:

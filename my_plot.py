@@ -39,7 +39,7 @@ def plot(table, gemm_dims, arch_names, latency_or_energy, ax, logscale = False, 
                 ax.text(i + multiplier*width, ylim,  f'{normed:.1f}', rotation=90, ha='center', va='top', size='small')
             # elif normed >0.8:
             #     ax.text(i + multiplier*width, normed,  f'{normed:.2f}', rotation=90, ha='center', va='top', size='small')
-            elif arch_name == "imec":
+            elif arch_name == "SCD":
                 ax.text(i + multiplier*width, normed,  f'{normed:.2f}', rotation=90, ha='center', va='bottom', size='small')
         multiplier += 1
     # ax.set_ylabel(f'{latency_or_energy}_normed')

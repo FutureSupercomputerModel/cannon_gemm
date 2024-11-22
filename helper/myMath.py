@@ -3,14 +3,14 @@ def ceildiv(a, b):
 
 import math
 
-def bytes2str(size_bytes):
-   if size_bytes == 0:
-       return "0B"
-   size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-   i = int(math.floor(math.log(size_bytes, 1024)))
-   p = math.pow(1024, i)
-   s = round(size_bytes / p, 2)
-   return "%s %s" % (s, size_name[i])
+# def bytes2str(size_bytes):
+#    if size_bytes == 0:
+#        return "0B"
+#    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+#    i = int(math.floor(math.log(size_bytes, 1024)))
+#    p = math.pow(1024, i)
+#    s = round(size_bytes / p, 2)
+#    return "%s %s" % (s, size_name[i])
 
 def str2bytes(size_string):
     if size_string[-1] == 'B':
@@ -24,7 +24,25 @@ def str2bytes(size_string):
         size *= 1024*1024*1024
     elif 'T' in size_string:
         size *= 1024*1024*1024*1024
+    elif 'P' in size_string:
+        size *= 1024*1024*1024*1024*1024
     return size
+
+def bytes2str(size_bytes):
+    if size_bytes< 1024:
+        return f"{size_bytes}B"
+    elif size_bytes < 1024*1024:
+        return f"{size_bytes/1024}KB"
+    elif size_bytes < 1024*1024*1024:
+        return f"{size_bytes/1024/1024}MB"
+    elif size_bytes < 1024*1024*1024*1024:
+        return f"{size_bytes/1024/1024/1024}GB"
+    elif size_bytes < 1024*1024*1024*1024*1024:
+        return f"{size_bytes/1024/1024/1024/1024}TB"
+    elif size_bytes < 1024*1024*1024*1024*1024*1024:
+        return f"{size_bytes/1024/1024/1024/1024/1024}PB"
+    else:
+        return f"{size_bytes/1024/1024/1024/1024/1024/1024}EB"
 
 def str2GBps(bw_string):
     if 'PBps' in bw_string:
