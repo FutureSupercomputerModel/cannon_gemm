@@ -129,8 +129,8 @@ class Arch(Arch_base):
         E_compute = self.mesh_dim * self.p * E_child
 
         
-        T_send_A = (self.mesh_dim-1)*(self.ns_setup_interconnect+max(m*k/self.p/self.buffer_bw, m*k/self.p/self.child_arch.buffer_bw))
-        T_send_B = (self.mesh_dim-1)*(self.ns_setup_interconnect+max(k*n/self.p/self.buffer_bw, k*n/self.p/self.child_arch.buffer_bw))
+        T_send_A = (self.mesh_dim-1)*(self.ns_setup_interconnect+max(m*k/self.p/self.mesh_bw, m*k/self.p/self.child_arch.buffer_bw))
+        T_send_B = (self.mesh_dim-1)*(self.ns_setup_interconnect+max(k*n/self.p/self.mesh_bw, k*n/self.p/self.child_arch.buffer_bw))
         T_send = T_send_A + T_send_B
         if(T_send_A > T_send_B):
             self.T_send_bottleneck = "A"
@@ -282,7 +282,7 @@ class Arch(Arch_base):
     
     
     def print(self):
-        self.debugprint(f"total_chip_area={self.total_chip_area/1e8}cm^2, mesh_dim={self.mesh_dim}, buffer_size={bytes2str(self.buffer_size_bytes)}, buffer_bw={GBps2str(self.buffer_bw_GBps)}, mesh_bw={GBps2str(self.mesh_bw_GBps)}, mesh_E_per_bit={energy2str(self.mesh_nJ_per_bit)}, buffer_E_per_bit={energy2str(self.buffer_nJ_per_bit)}, min_gemm_size={self.min_gemm_size}, max_gemm_size: {self.get_max_gemm_size()}")
+        self.debugprint(f"total_chip_area={self.total_chip_area/1e8}cm^2, mesh_dim={self.mesh_dim}, buffer_size={bytes2str(self.buffer_size_bytes)}, buffer_bw={GBps2str(self.buffer_bw_GBps)}, mesh_bw={GBps2str(self.mesh_bw_GBps)}, mesh_E_per_bit={energy2str(self.mesh_nJ_per_bit)}, buffer_E_per_bit={energy2str(self.buffer_nJ_per_bit)}")
         if self.child_arch is not None:
             self.child_arch.print()
 

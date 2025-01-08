@@ -1,37 +1,45 @@
-from GEMM.arch import Arch
-from GEMM.leaf import Leaf
-from GEMM.arch import top_level_gemm
+from cannon_gemm.GEMM.arch import Arch
+from cannon_gemm.GEMM.leaf import Leaf
+from cannon_gemm.GEMM.arch import top_level_gemm
 import math
 import json
-import my_plot
+import cannon_gemm.my_plot
 from fractions import Fraction
-def exp_normalize_area():
+def exp_normalize_area(gemm_dims):
     h100_leaf = Leaf(pe_arr_dim=519.93, 
                         buffer_size=f'{50}MB', 
                         buffer_bw = f'{512*2*16/8*1.8}GBps', 
                         pe_freq=1.8, 
-                        E_per_mac="0.38pJ", 
+                        E_per_mac="1.41pJ", 
                         interconnect_E_per_bit="0.1pJ", 
                         buffer_E_per_bit='0.5fJ', 
                         bytes_per_element=2,
                         buffer_bit_area=0.058,
                         mac_area=550/3,
-                        is3d=False)
+                        is3d=False,
+                        is_systolic=False)
     h100_blade = Arch(mesh_dim=1.0, 
                     mesh_bw=f'{450}GBps', #NVLink
                     buffer_size="80GB", 
                     buffer_bw='3352GBps', 
                     mesh_E_per_bit='0.1pJ', 
                     buffer_E_per_bit='0.29pJ', 
+                    buffer_static_W_per_bit=f'{0}pW',
+                    sc_to_cryo_E_per_bit="0pJ",
+                    cryo_to_sc_E_per_bit="0pJ",
                     child_arch=h100_leaf)
-    h100_node = Arch(mesh_dim=4.0, 
+    h100_node = Arch(mesh_dim=27.0, 
                     mesh_bw=f'{450}GBps', 
-                    buffer_size="8TB", 
+                    buffer_size=f"{1000}PB", 
                     buffer_bw=f'{math.inf}TBps', 
                     mesh_E_per_bit='0.1pJ', 
-                    buffer_E_per_bit='0.29pJ', 
+                    buffer_E_per_bit='0pJ', 
+                    buffer_static_W_per_bit=f'{0}pW',
+                    sc_to_cryo_E_per_bit="0pJ",
+                    cryo_to_sc_E_per_bit="0pJ",
                     child_arch=h100_blade)
     h100_node.peak_power = 700*h100_node.mesh_dim*h100_node.mesh_dim
+    h100_node.name  = "h100"
 
 
 
@@ -39,56 +47,72 @@ def exp_normalize_area():
                         buffer_size=f'{24+4}MB', 
                         buffer_bw = f'{256*2*8/8*0.7}GBps', 
                         pe_freq=0.7/4, 
-                        E_per_mac="0.38pJ", 
+                        E_per_mac="6.54pJ", 
                         interconnect_E_per_bit="0.1pJ", 
                         buffer_E_per_bit='0.5fJ', 
                         bytes_per_element=2,
                         buffer_bit_area=0.058,
                         mac_area=550/3,
-                        is3d=False)
+                        is3d=False,
+                        is_systolic=False)
     tpuv1_blade = Arch(mesh_dim=1.0, 
                     mesh_bw=f'{300}GBps', #1000GBps
                     buffer_size="80GB", 
                     buffer_bw='30GBps', 
                     mesh_E_per_bit='0.1pJ', 
                     buffer_E_per_bit='0.29pJ', 
+                    buffer_static_W_per_bit=f'{0}pW',
+                    sc_to_cryo_E_per_bit="0pJ",
+                    cryo_to_sc_E_per_bit="0pJ",
                     child_arch=tpuv1_leaf)
-    tpuv1_node = Arch(mesh_dim=6.0, 
+    tpuv1_node = Arch(mesh_dim=42.0, 
                     mesh_bw=f'{300}GBps', 
-                    buffer_size="8TB", 
+                    buffer_size=f"{1000}PB", 
                     buffer_bw=f'{math.inf}GBps', 
                     mesh_E_per_bit='0.1pJ', 
-                    buffer_E_per_bit='0.29pJ', 
+                    buffer_E_per_bit='0pJ', 
+                    buffer_static_W_per_bit=f'{0}pW',
+                    sc_to_cryo_E_per_bit="0pJ",
+                    cryo_to_sc_E_per_bit="0pJ",
                     child_arch=tpuv1_blade)
     tpuv1_node.peak_power = 75*tpuv1_node.mesh_dim*tpuv1_node.mesh_dim
+    tpuv1_node.name = "tpuv1"
 
 #361=sqrt(128*128*4*2)
     tpuv4_leaf = Leaf(pe_arr_dim=361.0, 
                         buffer_size=f'{128}MB', 
                         buffer_bw = f'{362*2*8/8*1.05}GBps', 
                         pe_freq=1.05, 
-                        E_per_mac="0.38pJ", 
+                        E_per_mac="1.40pJ", 
                         interconnect_E_per_bit="0.1pJ", 
                         buffer_E_per_bit='0.5fJ', 
                         bytes_per_element=2,
                         buffer_bit_area=0.058,
                         mac_area=550,
-                        is3d=False)
+                        is3d=False,
+                        is_systolic=False)
     tpuv4_blade = Arch(mesh_dim=1.0, 
                     mesh_bw=f'{300}GBps', #1000GBps
                     buffer_size="32GB", 
                     buffer_bw='1200GBps', 
                     mesh_E_per_bit='0.1pJ', 
                     buffer_E_per_bit='0.29pJ', 
+                    buffer_static_W_per_bit=f'{0}pW',
+                    sc_to_cryo_E_per_bit="0pJ",
+                    cryo_to_sc_E_per_bit="0pJ",
                     child_arch=tpuv4_leaf)
-    tpuv4_node = Arch(mesh_dim=4.0, 
+    tpuv4_node = Arch(mesh_dim=31.0, 
                     mesh_bw=f'{300}GBps', 
-                    buffer_size="8TB", 
+                    buffer_size=f"{1000}PB", 
                     buffer_bw=f'{math.inf}GBps', 
                     mesh_E_per_bit='0.1pJ', 
-                    buffer_E_per_bit='0.29pJ', 
+                    buffer_E_per_bit='0pJ', 
+                    buffer_static_W_per_bit=f'{0}pW',
+                    sc_to_cryo_E_per_bit="0pJ",
+                    cryo_to_sc_E_per_bit="0pJ",
                     child_arch=tpuv4_blade)
     tpuv4_node.peak_power = 192*tpuv4_node.mesh_dim*tpuv4_node.mesh_dim
+    tpuv4_node.name = "tpuv4"
 
 
 
@@ -104,20 +128,27 @@ def exp_normalize_area():
                         buffer_bit_area=0.058,
                         mac_area=550,
                         is3d=True)
-    cmos3d_blade = Arch(mesh_dim=9.0, 
+    cmos3d_blade = Arch(mesh_dim=8.0, 
                     mesh_bw=f'{9680}GBps', #1000GBps
                     buffer_size="80GB", 
                     buffer_bw='30.0TBps', 
                     mesh_E_per_bit='0.1pJ', 
                     buffer_E_per_bit='0.29pJ', 
+                    buffer_static_W_per_bit=f'{1.33}pW',
+                    sc_to_cryo_E_per_bit="0pJ",
+                    cryo_to_sc_E_per_bit="0pJ",
                     child_arch=cmos3d_leaf)
-    cmos3d_node = Arch(mesh_dim=1.0, 
+    cmos3d_node = Arch(mesh_dim=8.0, 
                     mesh_bw='1PBps', 
-                    buffer_size="8TB", 
+                    buffer_size=f"{1000}PB", 
                     buffer_bw='3.0PBps', 
                     mesh_E_per_bit='0.1pJ', 
-                    buffer_E_per_bit='0.29pJ', 
+                    buffer_E_per_bit='0pJ', 
+                    buffer_static_W_per_bit=f'{0}pW',
+                    sc_to_cryo_E_per_bit="0pJ",
+                    cryo_to_sc_E_per_bit="0pJ",
                     child_arch=cmos3d_blade)
+    cmos3d_node.name = "cmos3d"
 
 
 
@@ -133,20 +164,27 @@ def exp_normalize_area():
                         buffer_bit_area=0.058,
                         mac_area=550,
                         is3d=True)
-    cryoE_blade = Arch(mesh_dim=9.0, 
+    cryoE_blade = Arch(mesh_dim=8.0, 
                     mesh_bw=f'{9680}GBps', 
                     buffer_size="80GB", 
                     buffer_bw='30.0TBps', 
                     mesh_E_per_bit='0.1pJ', 
                     buffer_E_per_bit=f'{22*0.029}pJ', 
+                    buffer_static_W_per_bit=f'{22*1.33}pW',
+                    sc_to_cryo_E_per_bit="0pJ",
+                    cryo_to_sc_E_per_bit="0pJ",
                     child_arch=cryoE_leaf)
-    cryoE_node = Arch(mesh_dim=1.0, 
+    cryoE_node = Arch(mesh_dim=8.0, 
                     mesh_bw='1PBps', 
-                    buffer_size="8TB", 
+                    buffer_size=f"{1000}PB", 
                     buffer_bw='3.0PBps', 
                     mesh_E_per_bit='0.1pJ', 
-                    buffer_E_per_bit=f'{22*0.029}pJ', 
+                    buffer_E_per_bit=f'{0}pJ', 
+                    buffer_static_W_per_bit=f'{0}pW',
+                    sc_to_cryo_E_per_bit="0pJ",
+                    cryo_to_sc_E_per_bit="0pJ",
                     child_arch=cryoE_blade)
+    cryoE_node.name = "cryoE"
 
 
 
@@ -160,20 +198,27 @@ def exp_normalize_area():
                         bytes_per_element=2,
                         buffer_bit_area=0.058,
                         mac_area=550)
-    cryoP_blade = Arch(mesh_dim=9.0, 
+    cryoP_blade = Arch(mesh_dim=8.0, 
                     mesh_bw=f'{13552}GBps', 
                     buffer_size="80GB", 
                     buffer_bw='30.0TBps', 
                     mesh_E_per_bit='0.1pJ', 
                     buffer_E_per_bit=f'{22*0.29}pJ', 
+                    buffer_static_W_per_bit=f'{22*1.33}pW',
+                    sc_to_cryo_E_per_bit="0pJ",
+                    cryo_to_sc_E_per_bit="0pJ",
                     child_arch=cryoP_leaf)
-    cryoP_node = Arch(mesh_dim=1.0, 
+    cryoP_node = Arch(mesh_dim=8.0, 
                     mesh_bw='1PBps', 
-                    buffer_size="8TB", 
+                    buffer_size=f"{1000}PB", 
                     buffer_bw='3.0PBps', 
                     mesh_E_per_bit='0.1pJ', 
-                    buffer_E_per_bit=f'{22*0.29}pJ', 
+                    buffer_E_per_bit=f'{0}pJ', 
+                    buffer_static_W_per_bit=f'{0}pW',
+                    sc_to_cryo_E_per_bit="0pJ",
+                    cryo_to_sc_E_per_bit="0pJ",
                     child_arch=cryoP_blade)
+    cryoP_node.name = "cryoP"
 
 
 
@@ -189,21 +234,28 @@ def exp_normalize_area():
                         buffer_bit_area=3.125,
                         mac_area=3600,
                         is3d=True)
-    imec_blade = Arch(mesh_dim=9.0, 
+    imec_blade = Arch(mesh_dim=8.0, 
                     mesh_bw=f'{73.34}TBps', 
                     buffer_size="80GB", 
                     buffer_bw='30.0TBps', 
                     mesh_E_per_bit='5e-4pJ', 
                     buffer_E_per_bit=f'{22*0.029}pJ', 
+                    buffer_static_W_per_bit=f'{22*1.33}pW',
+                    sc_to_cryo_E_per_bit="0.4pJ",
+                    cryo_to_sc_E_per_bit="4.24pJ", 
                     child_arch=imec_leaf)
-    imec_node = Arch(mesh_dim=1.0, 
+    imec_node = Arch(mesh_dim=8.0, 
                     mesh_bw='1PBps', 
-                    buffer_size="8TB", 
+                    buffer_size=f"{1000}PB", 
                     buffer_bw='3.0PBps', 
                     mesh_E_per_bit='5e-3pJ', 
-                    buffer_E_per_bit=f'{22*0.029}pJ', 
+                    buffer_E_per_bit=f'{0}pJ', 
+                    buffer_static_W_per_bit=f'{0}pW',
+                    sc_to_cryo_E_per_bit="0pJ",
+                    cryo_to_sc_E_per_bit="0pJ",
                     child_arch=imec_blade)
-    gemm_dims = [819, 8192, 81920, 819200]
+    imec_node.name = "imec"
+
     gemm_sizes = [
         (m, m, m) for m in gemm_dims
     ]
@@ -212,19 +264,25 @@ def exp_normalize_area():
     for m,k,n in gemm_sizes:
         time_list = []
         energy_list = []
-        for arch in [h100_node, tpuv1_node, tpuv4_node]:
-            time,_,_,_,_,log = top_level_gemm(m,k,n, arch, debug=False, general_tiling=True)
-            log = json.loads(log)
-            print (f"Time: {time}, Energy: {time * arch.peak_power}, Time_compute: {log['Level 0 logs']['T_compute']*1E-9}")
-            time_list.append(time)
-            energy_list.append(time * arch.peak_power)
-        for arch in [cryoE_node, cryoP_node, imec_node]:
+        for arch in [h100_node, tpuv4_node]:
+            print(f"\n\n/////////////////////////////////////////{arch.name}//////////////////////////////////////////////////////////")
             time,energy,_,_,_,log = top_level_gemm(m,k,n, arch, debug=False, general_tiling=True)
+            log = json.loads(log)
+            
+            print (f"{arch.name} Time: {time}, Energy: {time * arch.peak_power}, Time_compute: {log['Level 0 logs']['T_compute']*1E-9}")
+            time_list.append(time)
+            # energy_list.append(time * arch.peak_power)
+            energy_list.append(energy)
+        for arch in [cryoE_node, imec_node]:
+            print(f"/////////////////////////////////////////{arch.name}//////////////////////////////////////////////////////////")
+            time,energy,_,_,_,log = top_level_gemm(m,k,n, arch, debug=False, general_tiling=True)
+            print(log)
             log = json.loads(log)
             leaf_arch = arch
             while leaf_arch.child_arch is not None:
                 leaf_arch = leaf_arch.child_arch
-            print (f"Time: {time}, Energy: {energy}, Time_compute: {log['Level 0 logs']['T_compute']*1E-9}, energy_compute: {log['Level 0 logs']['mac']*leaf_arch.nJ_per_mac*1e-9}")
+            print (f"{arch.name} Time: {time}, Time_compute: {log['Level 0 logs']['T_compute']*1E-9}, Energy: {energy}, E_compute: {log["E_compute"]}, E_memory:{log["E_memory"]}, E_interconnect:{log["E_interconnect"]}, E_interface:{log["E_SC_cryo_interface"]}, E_dyanmic:{log["E_dynamic"]}, E_static: {log["E_static"]}")
+            
             time_list.append(time)
             energy_list.append(energy)
 
