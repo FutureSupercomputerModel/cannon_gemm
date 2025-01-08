@@ -302,6 +302,7 @@ class Arch(Arch_base):
 #return T_top(s), E_total(J), T_memory(s), T_communication(s), T_compute(s), log
 def top_level_gemm(m,k,n, arch: Arch, debug:bool, general_tiling=True):
     arch.reset_log()
+    energy_components = {}
     if debug:
         print("================Arch=====================")
         arch.print()
@@ -335,6 +336,13 @@ def top_level_gemm(m,k,n, arch: Arch, debug:bool, general_tiling=True):
     log["E_compute"] = E_compute* 1e-9
     log["E_memory"] = E_memory* 1e-9
     log["E_SC_cryo_interface"] = E_SC_cryo_interface* 1e-9
+    energy_components['E_total'] = E_total
+    energy_components['E_dynamic'] = E_total - arch.total_static_W * T_top
+    energy_components['E_static'] = arch.total_static_W * T_top
+    energy_components['E_interconnect'] = E_interconnect * 1e-9
+    energy_components['E_compute'] = E_compute* 1e-9
+    energy_components['E_memory'] = E_memory* 1e-9
+    energy_components["E_SC_cryo_interface"] = E_SC_cryo_interface* 1e-9
     if debug:
         
         print("----------------Accumulated Logs------------------")
@@ -351,5 +359,5 @@ def top_level_gemm(m,k,n, arch: Arch, debug:bool, general_tiling=True):
     T_memory = (arch.log.T_prep + arch.log.T_store)*1E-9
     T_communication = arch.log.T_send*1E-9
     T_compute = arch.log.T_compute*1E-9
-    return T_top, E_total, T_memory, T_communication, T_compute, log
+    return T_top, energy_components, T_memory, T_communication, T_compute, log
     
