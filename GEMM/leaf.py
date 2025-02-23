@@ -78,8 +78,10 @@ class Leaf(Arch_base):
     def print_log(self):
         self.debugprint(self.log.toString())
 
-    def OutputStationary(self, m,n,K,cycle_time, bw):
+    def OutputStationary(self, m,n,K,cycle_time, bw, debug):
         t_compute = (2*m + n + K - 2)*cycle_time
+        if debug:
+            print(f"t_compute: {t_compute} = (2*{m} + {n} + {K} - 2)*{cycle_time}")
         t_load = (m*K+K*n)/bw
         t_store = m*n/bw
         t_total = max(t_compute, t_load + t_store)
@@ -97,12 +99,15 @@ class Leaf(Arch_base):
             m = M%d
             n = N%d
 
-            t_DD, t_DD_compute, t_DD_load, t_DD_store, DD_elems = self.OutputStationary(d,d,K,cycle_time, bw)
-            t_Dn, t_Dn_compute, t_Dn_load, t_Dn_store, Dn_elems = self.OutputStationary(d,n,K,cycle_time, bw)
-            t_mD, t_mD_compute, t_mD_load, t_mD_store, mD_elems = self.OutputStationary(m,d,K,cycle_time, bw)
-            t_mn, t_mn_compute, t_mn_load, t_mn_store, mn_elems = self.OutputStationary(m,n,K,cycle_time, bw)
+            t_DD, t_DD_compute, t_DD_load, t_DD_store, DD_elems = self.OutputStationary(d,d,K,cycle_time, bw, debug)
+            t_Dn, t_Dn_compute, t_Dn_load, t_Dn_store, Dn_elems = self.OutputStationary(d,n,K,cycle_time, bw, debug)
+            t_mD, t_mD_compute, t_mD_load, t_mD_store, mD_elems = self.OutputStationary(m,d,K,cycle_time, bw, debug)
+            t_mn, t_mn_compute, t_mn_load, t_mn_store, mn_elems = self.OutputStationary(m,n,K,cycle_time, bw, debug)
+           
             
-            T_total = math.floor(M/d)*math.floor(N/d)*t_DD + math.floor(M/d)*t_Dn + math.floor(N/d)*t_mD + t_mn
+            T_total = math.floor(M/d)*math.floor(N/d)*t_DD + math.floor(M/d)*t_Dn + math.floor(N/d)*t_mD + t_mn 
+            if debug:
+                print(f"{math.floor(M/d)*math.floor(N/d)} x t_DD: {t_DD} + {math.floor(M/d)} x t_Dn: {t_Dn} + {math.floor(N/d)} * t_mD: {t_mD} + t_mn: {t_mn} = {T_total}")
             T_compute = math.floor(M/d)*math.floor(N/d)*t_DD_compute + math.floor(M/d)*t_Dn_compute + math.floor(N/d)*t_mD_compute + t_mn_compute
             T_load = math.floor(M/d)*math.floor(N/d)*t_DD_load + math.floor(M/d)*t_Dn_load + math.floor(N/d)*t_mD_load + t_mn_load
             T_store = math.floor(M/d)*math.floor(N/d)*t_DD_store + math.floor(M/d)*t_Dn_store + math.floor(N/d)*t_mD_store + t_mn_store
@@ -111,8 +116,8 @@ class Leaf(Arch_base):
 
         elif M > d:
             m = M%d
-            t_DN, t_DN_compute, t_DN_load, t_DN_store, DN_elems = self.OutputStationary(d,N,K,cycle_time, bw)
-            t_mN, t_mN_compute, t_mN_load, t_mN_store, mN_elems = self.OutputStationary(m,N,K,cycle_time, bw)
+            t_DN, t_DN_compute, t_DN_load, t_DN_store, DN_elems = self.OutputStationary(d,N,K,cycle_time, bw, debug)
+            t_mN, t_mN_compute, t_mN_load, t_mN_store, mN_elems = self.OutputStationary(m,N,K,cycle_time, bw, debug)
             T_total = math.floor(M/d)*t_DN + t_mN
             T_compute = math.floor(M/d)*t_DN_compute + t_mN_compute
             T_load = math.floor(M/d)*t_DN_load + t_mN_load
@@ -121,8 +126,8 @@ class Leaf(Arch_base):
         
         elif N > d:
             n = N%d
-            t_MD, t_MD_compute, t_MD_load, t_MD_store, MD_elems = self.OutputStationary(M,d,K,cycle_time, bw)
-            t_Mn, t_Mn_compute, t_Mn_load, t_Mn_store, Mn_elems = self.OutputStationary(M,n,K,cycle_time, bw)
+            t_MD, t_MD_compute, t_MD_load, t_MD_store, MD_elems = self.OutputStationary(M,d,K,cycle_time, bw, debug)
+            t_Mn, t_Mn_compute, t_Mn_load, t_Mn_store, Mn_elems = self.OutputStationary(M,n,K,cycle_time, bw, debug)
             T_total = math.floor(N/d)*t_MD + t_Mn
             T_compute = math.floor(N/d)*t_MD_compute + t_Mn_compute
             T_load = math.floor(N/d)*t_MD_load + t_Mn_load
@@ -130,7 +135,7 @@ class Leaf(Arch_base):
             elems_accessed = math.floor(N/d)*MD_elems + Mn_elems
            
         else:
-            t_MN, t_MN_compute, t_MN_load, t_MN_store, MN_elems = self.OutputStationary(M,N,K,cycle_time, bw)
+            t_MN, t_MN_compute, t_MN_load, t_MN_store, MN_elems = self.OutputStationary(M,N,K,cycle_time, bw, debug)
             T_total = t_MN
             T_compute = t_MN_compute
             T_load = t_MN_load
