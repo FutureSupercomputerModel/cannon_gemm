@@ -1,10 +1,15 @@
 import copy
 import math
 import numpy as np
-from cannon_gemm.GEMM.arch_base import Arch_base, Log
-from cannon_gemm.GEMM.leaf import Leaf
-from cannon_gemm.helper.myMath import *
+# from cannon_gemm.GEMM.arch_base import Arch_base, Log
+# from cannon_gemm.GEMM.leaf import Leaf
+# from cannon_gemm.helper.myMath import *
 import json
+
+from GEMM.arch_base import Arch_base, Log
+from GEMM.leaf import Leaf
+from helper.myMath import *
+
 class Arch(Arch_base):
     # #Buffer
     # buffer_size = 8.0*1024*1024*1024 #8GB
@@ -25,7 +30,7 @@ class Arch(Arch_base):
 
 
 
-    def __init__(self, mesh_dim:float, mesh_bw:str, buffer_size:str, buffer_bw:str, 
+    def __init__(self, mesh_dim:float, mesh_bw:str, buffer_size:str, buffer_bw:str,
                  mesh_E_per_bit:float, buffer_E_per_bit:float, buffer_static_W_per_bit:float, sc_to_cryo_E_per_bit:float, cryo_to_sc_E_per_bit:float,
                  child_arch:Arch_base,
                  ns_setup_interconnect:float=0,
@@ -36,7 +41,7 @@ class Arch(Arch_base):
         self.mesh_bw_GBps = str2GBps(mesh_bw)
         self.buffer_size_bytes = str2bytes(buffer_size)
         self.buffer_bw_GBps = str2GBps(buffer_bw)
-        
+
 
         #tech params
         self.mesh_nJ_per_bit = str2energy(mesh_E_per_bit)
@@ -62,7 +67,7 @@ class Arch(Arch_base):
         self.log = Log()
 
         self.total_chip_area = self.child_arch.total_chip_area * mesh_dim * mesh_dim
-    
+
     def to_dict(self):
         return {
             "mesh_dim": self.mesh_dim,
@@ -88,7 +93,7 @@ class Arch(Arch_base):
         self.log.update_latency(num_iter)
         if self.child_arch is not None:
             self.child_arch.update_latency_log_recursively(num_iter)
-    
+
     def get_max_gemm_size(self):
         min_problem_dim = self.mesh_dim * self.child_arch.min_gemm_size
         min_problem_size = min_problem_dim**2*3
@@ -114,11 +119,11 @@ class Arch(Arch_base):
         if debug:
             self.debugprint(f"spatial tiling: from {m_in}, {k_in}, {n_in}, to leaf problem: {m_leaf}, {k_leaf}, {n_leaf}")
         return (m, k, n, m_leaf, k_leaf, n_leaf)
-    
+
     def cannon_gemm(self, m_in,k_in,n_in,debug:bool, general_tiling):
         m,k,n,m_leaf,k_leaf,n_leaf = self.spatial_tile_gemm(m_in,k_in,n_in,debug)
-       
-        if(self.p>1): 
+
+        if(self.p>1):
             T_prep_A = self.ns_setup_interconnect + max(m*k/self.p/self.mesh_bw, m*k/self.p/self.child_arch.buffer_bw)#time to set up connection + max ( time for interconnect send, time for child buffer receive)
             T_prep_B = self.ns_setup_interconnect + max(k*n/self.p/self.mesh_bw, k*n/self.p/self.child_arch.buffer_bw)
             T_prep = max(T_prep_A+T_prep_B, (m*k+k*n)/self.buffer_bw )#time to load A and B, potentially bound by dram bandwidth
@@ -128,7 +133,7 @@ class Arch(Arch_base):
         T_compute = self.mesh_dim * T_child
         E_compute = self.mesh_dim * self.p * E_child
 
-        
+
         T_send_A = (self.mesh_dim-1)*(self.ns_setup_interconnect+max(m*k/self.p/self.mesh_bw, m*k/self.p/self.child_arch.buffer_bw))
         T_send_B = (self.mesh_dim-1)*(self.ns_setup_interconnect+max(k*n/self.p/self.mesh_bw, k*n/self.p/self.child_arch.buffer_bw))
         T_send = T_send_A + T_send_B
@@ -137,19 +142,19 @@ class Arch(Arch_base):
         elif(T_send_A < T_send_B):
             self.T_send_bottleneck = "B"
         T_store = self.ns_setup_interconnect+max(m*n/self.buffer_bw, m*n/self.p/self.child_arch.buffer_bw)
-        
+
         if self.roofline:
             latency = max(T_prep+T_store, T_compute, T_send)
         else:
             latency = T_prep + T_compute + T_send + T_store
-            
+
         #energy
         bits_prep_buffer_read = (m_leaf*k_leaf+k_leaf*n_leaf)*self.p*self.bytes_per_element*8.0
         E_uplink = bits_prep_buffer_read * self.cryo_to_sc_E_per_bit
-        E_prep_buffer_read = bits_prep_buffer_read * self.buffer_nJ_per_bit + E_uplink 
+        E_prep_buffer_read = bits_prep_buffer_read * self.buffer_nJ_per_bit + E_uplink
         E_prep_child_buffer_write = bits_prep_buffer_read * self.child_arch.buffer_nJ_per_bit
         bits_perp_interconnect = self.mesh_dim * (1+self.mesh_dim) * self.bytes_per_element * 8.0 * (m_leaf*k_leaf + k_leaf*n_leaf)/2.0
-        E_prep_interconnect = bits_perp_interconnect * self.mesh_nJ_per_bit 
+        E_prep_interconnect = bits_perp_interconnect * self.mesh_nJ_per_bit
         E_prep = E_prep_buffer_read + E_prep_child_buffer_write + E_prep_interconnect
         # print(E_prep_buffer_read, E_prep_child_buffer_write, E_prep_interconnect)
         bits_send = self.mesh_dim * self.p * (m_leaf*k_leaf + k_leaf*n_leaf) * self.bytes_per_element * 8.0
@@ -185,9 +190,9 @@ class Arch(Arch_base):
             self.debugprint(f"child buffer load store bits: {bits_prep_buffer_read + bits_send*2 + bits_store}")
             self.debugprint(f"interconnect transfer bits: {(bits_perp_interconnect+bits_send+bits_store)}")
         return latency, E_total
-    
 
-        
+
+
 
     def temp_tile_gemm(self, m,k,n, debug):
         #temporal tiling
@@ -202,7 +207,7 @@ class Arch(Arch_base):
         if debug:
             self.debugprint(f"temporal tiling: from {m}, {k}, {n}, to tiled problem: {m_tile}, {k_tile}, {n_tile}, on {iteration} iterations")
         return (m_tile, k_tile, n_tile, iteration)
-    
+
     def temp_tile_gemm_general(self, m,k,n, debug):
         #general temporal tiling, works for unsquare matrices
         assert (m*k+n*k+m*n)*self.bytes_per_element <= self.buffer_size_bytes, f"problem size exceeds buffer size: {bytes2str((m*k+n*k+m*n)*self.bytes_per_element)} > {bytes2str(self.buffer_size_bytes)}"
@@ -262,7 +267,7 @@ class Arch(Arch_base):
         if debug:
             self.debugprint(f"temporal tiling: from {m}, {k}, {n}, to tiled problem: {m_tile}, {k_tile}, {n_tile}, on {iteration} iterations")
         return (m_tile, k_tile, n_tile, iteration)
-    
+
     def get_gemm_latency_energy(self, m,k,n, debug:bool, general_tiling=True):
         #report buffer usage
         if debug:
@@ -279,8 +284,8 @@ class Arch(Arch_base):
         #     self.debugprint(f"latency per iteration: {T_tile}, energy per iteration: {E_tile}")
         return T_tile*iteration, E_tile*iteration
 
-    
-    
+
+
     def print(self):
         self.debugprint(f"total_chip_area={self.total_chip_area/1e8}cm^2, mesh_dim={self.mesh_dim}, buffer_size={bytes2str(self.buffer_size_bytes)}, buffer_bw={GBps2str(self.buffer_bw_GBps)}, mesh_bw={GBps2str(self.mesh_bw_GBps)}, mesh_E_per_bit={energy2str(self.mesh_nJ_per_bit)}, buffer_E_per_bit={energy2str(self.buffer_nJ_per_bit)}")
         if self.child_arch is not None:
@@ -323,7 +328,7 @@ def top_level_gemm(m,k,n, arch: Arch, debug:bool, general_tiling=True):
     arch_copy = copy.deepcopy(arch)
     while arch_copy.child_arch is not None:
         arch_copy = arch_copy.child_arch
-        log[f"Level {arch_copy.level} logs"] = arch_copy.log.to_dict() 
+        log[f"Level {arch_copy.level} logs"] = arch_copy.log.to_dict()
         E_interconnect += arch_copy.log.interconnect_E_nJ
         E_compute += arch_copy.log.mac_E_nJ
         E_memory += arch_copy.log.buffer_E_nJ
@@ -344,7 +349,7 @@ def top_level_gemm(m,k,n, arch: Arch, debug:bool, general_tiling=True):
     energy_components['E_memory'] = E_memory* 1e-9
     energy_components["E_SC_cryo_interface"] = E_SC_cryo_interface* 1e-9
     if debug:
-        
+
         print("----------------Accumulated Logs------------------")
         arch.print_log()
         leaf_arch = arch
@@ -360,4 +365,4 @@ def top_level_gemm(m,k,n, arch: Arch, debug:bool, general_tiling=True):
     T_communication = arch.log.T_send*1E-9
     T_compute = arch.log.T_compute*1E-9
     return T_top, energy_components, T_memory, T_communication, T_compute, log
-    
+

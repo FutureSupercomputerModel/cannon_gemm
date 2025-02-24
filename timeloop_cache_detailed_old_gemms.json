@@ -1,0 +1,282 @@
+{
+    "1000_400_3000_imec-gemm_200_20": {
+        "energy": 1.68e-05,
+        "cycles": 30000,
+        "latency": 3e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 1.68e-05,
+        "utilization": 1.0
+    },
+    "400_400_200_imec-gemm_200_20": {
+        "energy": 4.48e-07,
+        "cycles": 800,
+        "latency": 8.000000000000001e-07,
+        "sram-energy": 0.0,
+        "mac-energy": 4.48e-07,
+        "utilization": 1.0
+    },
+    "400_200_400_imec-gemm_200_20": {
+        "energy": 4.48e-07,
+        "cycles": 800,
+        "latency": 8.000000000000001e-07,
+        "sram-energy": 0.0,
+        "mac-energy": 4.48e-07,
+        "utilization": 1.0
+    },
+    "1000_3000_400_imec-gemm_200_20": {
+        "energy": 1.68e-05,
+        "cycles": 30000,
+        "latency": 3e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 1.68e-05,
+        "utilization": 1.0
+    },
+    "1000_1600_3000_imec-gemm_200_20": {
+        "energy": 6.72e-05,
+        "cycles": 120000,
+        "latency": 0.00012,
+        "sram-energy": 0.0,
+        "mac-energy": 6.72e-05,
+        "utilization": 1.0
+    },
+    "1000_3000_1600_imec-gemm_200_20": {
+        "energy": 6.72e-05,
+        "cycles": 120000,
+        "latency": 0.00012,
+        "sram-energy": 0.0,
+        "mac-energy": 6.72e-05,
+        "utilization": 1.0
+    },
+    "400_1600_3000_imec-gemm_200_20": {
+        "energy": 2.688e-05,
+        "cycles": 48000,
+        "latency": 4.8e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 2.688e-05,
+        "utilization": 1.0
+    },
+    "400_2400_3000_imec-gemm_200_20": {
+        "energy": 4.032e-05,
+        "cycles": 72000,
+        "latency": 7.2e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 4.032e-05,
+        "utilization": 1.0
+    },
+    "400_3000_2400_imec-gemm_200_20": {
+        "energy": 4.032e-05,
+        "cycles": 72000,
+        "latency": 7.2e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 4.032e-05,
+        "utilization": 1.0
+    },
+    "600_1600_3000_imec-gemm_200_20": {
+        "energy": 4.032e-05,
+        "cycles": 72000,
+        "latency": 7.2e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 4.032e-05,
+        "utilization": 1.0
+    },
+    "600_2400_3000_imec-gemm_200_20": {
+        "energy": 6.048e-05,
+        "cycles": 108000,
+        "latency": 0.00010800000000000001,
+        "sram-energy": 0.0,
+        "mac-energy": 6.048e-05,
+        "utilization": 1.0
+    },
+    "600_3000_2400_imec-gemm_200_20": {
+        "energy": 6.048e-05,
+        "cycles": 108000,
+        "latency": 0.00010800000000000001,
+        "sram-energy": 0.0,
+        "mac-energy": 6.048e-05,
+        "utilization": 1.0
+    },
+    "1000_1800_3000_imec-gemm_200_20": {
+        "energy": 7.56e-05,
+        "cycles": 135000,
+        "latency": 0.000135,
+        "sram-energy": 0.0,
+        "mac-energy": 7.56e-05,
+        "utilization": 1.0
+    },
+    "1000_3000_1800_imec-gemm_200_20": {
+        "energy": 7.56e-05,
+        "cycles": 135000,
+        "latency": 0.000135,
+        "sram-energy": 0.0,
+        "mac-energy": 7.56e-05,
+        "utilization": 1.0
+    },
+    "2000_800_3000_imec-gemm_200_20": {
+        "energy": 6.72e-05,
+        "cycles": 120000,
+        "latency": 0.00012,
+        "sram-energy": 0.0,
+        "mac-energy": 6.72e-05,
+        "utilization": 1.0
+    },
+    "2000_2000_1600_imec-gemm_200_20": {
+        "energy": 8.96e-05,
+        "cycles": 160000,
+        "latency": 0.00016,
+        "sram-energy": 0.0,
+        "mac-energy": 8.96e-05,
+        "utilization": 1.0
+    },
+    "2000_1600_2000_imec-gemm_200_20": {
+        "energy": 8.96e-05,
+        "cycles": 160000,
+        "latency": 0.00016,
+        "sram-energy": 0.0,
+        "mac-energy": 8.96e-05,
+        "utilization": 1.0
+    },
+    "2000_1600_1600_imec-gemm_200_20": {
+        "energy": 7.168e-05,
+        "cycles": 128000,
+        "latency": 0.00012800000000000002,
+        "sram-energy": 0.0,
+        "mac-energy": 7.168e-05,
+        "utilization": 1.0
+    },
+    "1200_1600_3000_imec-gemm_200_20": {
+        "energy": 8.064e-05,
+        "cycles": 144000,
+        "latency": 0.000144,
+        "sram-energy": 0.0,
+        "mac-energy": 8.064e-05,
+        "utilization": 1.0
+    },
+    "400_3000_1600_imec-gemm_200_20": {
+        "energy": 2.688e-05,
+        "cycles": 48000,
+        "latency": 4.8e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 2.688e-05,
+        "utilization": 1.0
+    },
+    "400_2000_3000_imec-gemm_200_20": {
+        "energy": 3.36e-05,
+        "cycles": 60000,
+        "latency": 6e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 3.36e-05,
+        "utilization": 1.0
+    },
+    "400_1000_5800_imec-gemm_200_20": {
+        "energy": 3.248e-05,
+        "cycles": 58000,
+        "latency": 5.8e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 3.248e-05,
+        "utilization": 1.0
+    },
+    "600_3000_1600_imec-gemm_200_20": {
+        "energy": 4.032e-05,
+        "cycles": 72000,
+        "latency": 7.2e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 4.032e-05,
+        "utilization": 1.0
+    },
+    "600_2000_3000_imec-gemm_200_20": {
+        "energy": 5.04e-05,
+        "cycles": 90000,
+        "latency": 9e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 5.04e-05,
+        "utilization": 1.0
+    },
+    "600_1000_5800_imec-gemm_200_20": {
+        "energy": 4.872e-05,
+        "cycles": 87000,
+        "latency": 8.7e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 4.872e-05,
+        "utilization": 1.0
+    },
+    "3800_800_1600_imec-gemm_200_20": {
+        "energy": 6.8096e-05,
+        "cycles": 121600,
+        "latency": 0.0001216,
+        "sram-energy": 0.0,
+        "mac-energy": 6.8096e-05,
+        "utilization": 1.0
+    },
+    "1200_3000_1600_imec-gemm_200_20": {
+        "energy": 8.064e-05,
+        "cycles": 144000,
+        "latency": 0.000144,
+        "sram-energy": 0.0,
+        "mac-energy": 8.064e-05,
+        "utilization": 1.0
+    },
+    "400_800_3000_imec-gemm_200_20": {
+        "energy": 1.344e-05,
+        "cycles": 24000,
+        "latency": 2.4e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 1.344e-05,
+        "utilization": 1.0
+    },
+    "400_3000_800_imec-gemm_200_20": {
+        "energy": 1.344e-05,
+        "cycles": 24000,
+        "latency": 2.4e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 1.344e-05,
+        "utilization": 1.0
+    },
+    "600_800_3000_imec-gemm_200_20": {
+        "energy": 2.016e-05,
+        "cycles": 36000,
+        "latency": 3.6e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 2.016e-05,
+        "utilization": 1.0
+    },
+    "600_3000_800_imec-gemm_200_20": {
+        "energy": 2.016e-05,
+        "cycles": 36000,
+        "latency": 3.6e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 2.016e-05,
+        "utilization": 1.0
+    },
+    "1000_800_3000_imec-gemm_200_20": {
+        "energy": 3.36e-05,
+        "cycles": 60000,
+        "latency": 6e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 3.36e-05,
+        "utilization": 1.0
+    },
+    "1000_3000_800_imec-gemm_200_20": {
+        "energy": 3.36e-05,
+        "cycles": 60000,
+        "latency": 6e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 3.36e-05,
+        "utilization": 1.0
+    },
+    "2000_3000_800_imec-gemm_200_20": {
+        "energy": 6.72e-05,
+        "cycles": 120000,
+        "latency": 0.00012,
+        "sram-energy": 0.0,
+        "mac-energy": 6.72e-05,
+        "utilization": 1.0
+    },
+    "3800_1600_800_imec-gemm_200_20": {
+        "energy": 6.8096e-05,
+        "cycles": 121600,
+        "latency": 0.0001216,
+        "sram-energy": 0.0,
+        "mac-energy": 6.8096e-05,
+        "utilization": 1.0
+    }
+}
