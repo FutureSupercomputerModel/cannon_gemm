@@ -79,6 +79,8 @@ class Leaf(Arch_base):
         self.debugprint(self.log.toString())
 
     def OutputStationary(self, m,n,K,cycle_time, bw, debug):
+        if m==0 or n==0 or K==0:
+            return 0,0,0,0,0
         t_compute = (2*m + n + K - 2)*cycle_time
         if debug:
             print(f"t_compute: {t_compute} = (2*{m} + {n} + {K} - 2)*{cycle_time}")
