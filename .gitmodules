@@ -1,3 +1,9 @@
 [submodule "calculon"]
 	path = calculon
 	url = https://github.com/FutureSupercomputerModel/calculon.git
+[submodule "calculon/cannon_gemm"]
+  path = calculon/cannon_gemm
+  url = https://github.com/FutureSupercomputerModel/cannon_gemm.git
+[submodule "calculon/cannon_gemm/Leaf_Modeling"]
+  path = calculon/cannon_gemm/Leaf_Modeling
+  url = https://github.com/FutureSupercomputerModel/Leaf_Modeling.git
