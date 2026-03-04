@@ -1,12 +1,12 @@
-# from cannon_gemm.GEMM.arch_base import Arch_base, Log
-# from cannon_gemm.Leaf_Modeling.src.leaf_interface import run_leaf_modeling
-# import math
-# from cannon_gemm.helper.myMath import *
-
-from GEMM.arch_base import Arch_base, Log
-from Leaf_Modeling.src.leaf_interface import run_leaf_modeling
+from cannon_gemm.GEMM.arch_base import Arch_base, Log
+from cannon_gemm.Leaf_Modeling.src.leaf_interface import run_leaf_modeling
 import math
-from helper.myMath import *
+from cannon_gemm.helper.myMath import *
+
+# from GEMM.arch_base import Arch_base, Log
+# from Leaf_Modeling.src.leaf_interface import run_leaf_modeling
+# import math
+# from helper.myMath import *
 
 class Leaf(Arch_base):
     # pe_arr_dim = 200.0
@@ -86,6 +86,8 @@ class Leaf(Arch_base):
         self.debugprint(self.log.toString())
 
     def OutputStationary(self, m,n,K,cycle_time, bw, debug):
+        if n == 0 or m == 0 or K == 0:
+            return 0, 0 , 0, 0 , 0
         t_compute = (2*m + n + K - 2)*cycle_time
         t_load = (m*K+K*n)/bw
         t_store = m*n/bw
@@ -95,6 +97,7 @@ class Leaf(Arch_base):
         elif (t_total == (t_store + t_load)):
             self.compute_time_dominated = False
         if debug:
+            self.debugprint(f"m: {m}, n: {n}, K: {K}, Cycle Time: {cycle_time}, TCOMPUTE: {t_compute}")
             self.debugprint(f"Compute bound (T/F): {self.compute_time_dominated}")
         load_elems = m*K+K*n
         store_elems = m*n
@@ -102,7 +105,8 @@ class Leaf(Arch_base):
         return t_total, t_compute, t_load, t_store, load_store_elems
     def scale_sim_systolic(self, M,K,N, debug):
 
-
+        if debug:
+            self.debugprint(f"Scale sim sys ---- M: {M}, K: {K} N: {N}")
         bw = self.buffer_bw
         d = self.pe_arr_dim
         cycle_time = 1/self.pe_freq

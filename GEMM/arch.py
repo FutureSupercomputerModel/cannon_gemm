@@ -1,14 +1,14 @@
 import copy
 import math
 import numpy as np
-# from cannon_gemm.GEMM.arch_base import Arch_base, Log
-# from cannon_gemm.GEMM.leaf import Leaf
-# from cannon_gemm.helper.myMath import *
+from cannon_gemm.GEMM.arch_base import Arch_base, Log
+from cannon_gemm.GEMM.leaf import Leaf
+from cannon_gemm.helper.myMath import *
 import json
 
-from GEMM.arch_base import Arch_base, Log
-from GEMM.leaf import Leaf
-from helper.myMath import *
+# from GEMM.arch_base import Arch_base, Log
+# from GEMM.leaf import Leaf
+# from helper.myMath import *
 
 class Arch(Arch_base):
     # #Buffer
