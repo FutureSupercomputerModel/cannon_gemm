@@ -1,0 +1,242 @@
+{
+    "1000_1000_1000": {
+        "energy": 1.4e-05,
+        "cycles": 25000,
+        "latency": 2.5e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 1.4e-05,
+        "utilization": 1.0
+    },
+    "900_1100_1000": {
+        "energy": 1.386e-05,
+        "cycles": 27500,
+        "latency": 2.75e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 1.386e-05,
+        "utilization": 0.9
+    },
+    "800_1000_1200": {
+        "energy": 1.344e-05,
+        "cycles": 24000,
+        "latency": 2.4e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 1.344e-05,
+        "utilization": 1.0
+    },
+    "1100_900_1100": {
+        "energy": 1.52459496e-05,
+        "cycles": 32400,
+        "latency": 3.24e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 1.52459496e-05,
+        "utilization": 0.8403
+    },
+    "1000_1100_1100": {
+        "energy": 1.6939692e-05,
+        "cycles": 33000,
+        "latency": 3.3e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 1.6939692e-05,
+        "utilization": 0.9167000000000001
+    },
+    "1200_1000_1200": {
+        "energy": 2.016e-05,
+        "cycles": 36000,
+        "latency": 3.6e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 2.016e-05,
+        "utilization": 1.0
+    },
+    "1300_900_1100": {
+        "energy": 1.80176724e-05,
+        "cycles": 37800,
+        "latency": 3.7800000000000004e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 1.80176724e-05,
+        "utilization": 0.8512000000000001
+    },
+    "1000_1100_1300": {
+        "energy": 2.0019538e-05,
+        "cycles": 38500,
+        "latency": 3.85e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 2.0019538e-05,
+        "utilization": 0.9286
+    },
+    "800_1200_900": {
+        "energy": 1.2096e-05,
+        "cycles": 24000,
+        "latency": 2.4e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 1.2096e-05,
+        "utilization": 0.9
+    },
+    "850_1050_950": {
+        "energy": 1.187025e-05,
+        "cycles": 26250,
+        "latency": 2.625e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 1.187025e-05,
+        "utilization": 0.8075
+    },
+    "1000_850_1200": {
+        "energy": 1.428e-05,
+        "cycles": 25500,
+        "latency": 2.5500000000000003e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 1.428e-05,
+        "utilization": 1.0
+    },
+    "1100_850_900": {
+        "energy": 1.1781e-05,
+        "cycles": 25500,
+        "latency": 2.5500000000000003e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 1.1781e-05,
+        "utilization": 0.825
+    },
+    "1000_1100_850": {
+        "energy": 1.309e-05,
+        "cycles": 27500,
+        "latency": 2.75e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 1.309e-05,
+        "utilization": 0.85
+    },
+    "950_1100_1000": {
+        "energy": 1.463e-05,
+        "cycles": 27500,
+        "latency": 2.75e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 1.463e-05,
+        "utilization": 0.95
+    },
+    "1500_1500_1500": {
+        "energy": 4.7249664e-05,
+        "cycles": 96000,
+        "latency": 9.6e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 4.7249664e-05,
+        "utilization": 0.8789
+    },
+    "1600_1400_1500": {
+        "energy": 4.704e-05,
+        "cycles": 89600,
+        "latency": 8.960000000000001e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 4.704e-05,
+        "utilization": 0.9375
+    },
+    "1400_1500_1600": {
+        "energy": 4.704e-05,
+        "cycles": 84000,
+        "latency": 8.400000000000001e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 4.704e-05,
+        "utilization": 1.0
+    },
+    "2000_1300_1200": {
+        "energy": 4.368e-05,
+        "cycles": 78000,
+        "latency": 7.8e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 4.368e-05,
+        "utilization": 1.0
+    },
+    "1300_1200_2000": {
+        "energy": 4.3678992e-05,
+        "cycles": 84000,
+        "latency": 8.400000000000001e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 4.3678992e-05,
+        "utilization": 0.9286
+    },
+    "1800_1100_1500": {
+        "energy": 4.158e-05,
+        "cycles": 79200,
+        "latency": 7.92e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 4.158e-05,
+        "utilization": 0.9375
+    },
+    "1500_1100_1800": {
+        "energy": 4.158e-05,
+        "cycles": 79200,
+        "latency": 7.92e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 4.158e-05,
+        "utilization": 0.9375
+    },
+    "1700_1300_1400": {
+        "energy": 4.33151082e-05,
+        "cycles": 81900,
+        "latency": 8.19e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 4.33151082e-05,
+        "utilization": 0.9444
+    },
+    "1400_1300_1700": {
+        "energy": 4.33151082e-05,
+        "cycles": 81900,
+        "latency": 8.19e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 4.33151082e-05,
+        "utilization": 0.9444
+    },
+    "1600_1300_1600": {
+        "energy": 4.6592e-05,
+        "cycles": 83200,
+        "latency": 8.32e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 4.6592e-05,
+        "utilization": 1.0
+    },
+    "1600_1600_1300": {
+        "energy": 4.65909248e-05,
+        "cycles": 89600,
+        "latency": 8.960000000000001e-05,
+        "sram-energy": 0.0,
+        "mac-energy": 4.65909248e-05,
+        "utilization": 0.9286
+    },
+    "1800_1800_1800": {
+        "energy": 8.1648e-05,
+        "cycles": 145800,
+        "latency": 0.00014580000000000002,
+        "sram-energy": 0.0,
+        "mac-energy": 8.1648e-05,
+        "utilization": 1.0
+    },
+    "2000_1500_2000": {
+        "energy": 8.4e-05,
+        "cycles": 150000,
+        "latency": 0.00015000000000000001,
+        "sram-energy": 0.0,
+        "mac-energy": 8.4e-05,
+        "utilization": 1.0
+    },
+    "2100_1400_1500": {
+        "energy": 6.1739216e-05,
+        "cycles": 123200,
+        "latency": 0.0001232,
+        "sram-energy": 0.0,
+        "mac-energy": 6.1739216e-05,
+        "utilization": 0.8948999999999999
+    },
+    "1600_1500_1700": {
+        "energy": 5.7118824e-05,
+        "cycles": 108000,
+        "latency": 0.00010800000000000001,
+        "sram-energy": 0.0,
+        "mac-energy": 5.7118824e-05,
+        "utilization": 0.9444
+    },
+    "1700_1500_1700": {
+        "energy": 6.0689979e-05,
+        "cycles": 121500,
+        "latency": 0.00012150000000000001,
+        "sram-energy": 0.0,
+        "mac-energy": 6.0689979e-05,
+        "utilization": 0.892
+    }
+}
