@@ -308,6 +308,7 @@ class Arch(Arch_base):
 def top_level_gemm(m,k,n, arch: Arch, debug:bool, general_tiling=True):
     arch.reset_log()
     energy_components = {}
+    latency_components = {}
     if debug:
         print("================Arch=====================")
         arch.print()
@@ -364,5 +365,9 @@ def top_level_gemm(m,k,n, arch: Arch, debug:bool, general_tiling=True):
     T_memory = (arch.log.T_prep + arch.log.T_store)*1E-9
     T_communication = arch.log.T_send*1E-9
     T_compute = arch.log.T_compute*1E-9
-    return T_top, energy_components, T_memory, T_communication, T_compute, log
-
+    latency_components['T_memory'] = T_memory
+    latency_components['T_communication'] = T_communication
+    latency_components['T_compute'] = T_compute
+    latency_components['T_top'] = T_top
+    return latency_components, energy_components, log
+    

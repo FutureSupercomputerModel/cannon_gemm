@@ -86,9 +86,14 @@ class Leaf(Arch_base):
         self.debugprint(self.log.toString())
 
     def OutputStationary(self, m,n,K,cycle_time, bw, debug):
+<<<<<<< HEAD
         if n == 0 or m == 0 or K == 0:
             return 0, 0 , 0, 0 , 0
+=======
+>>>>>>> 3399b00adaf5f555d974d465c39f9de7fc22999b
         t_compute = (2*m + n + K - 2)*cycle_time
+        if debug:
+            print(f"t_compute: {t_compute} = (2*{m} + {n} + {K} - 2)*{cycle_time}")
         t_load = (m*K+K*n)/bw
         t_store = m*n/bw
         t_total = max(t_compute, t_load + t_store)
@@ -118,8 +123,11 @@ class Leaf(Arch_base):
             t_Dn, t_Dn_compute, t_Dn_load, t_Dn_store, Dn_elems = self.OutputStationary(d,n,K,cycle_time, bw, debug)
             t_mD, t_mD_compute, t_mD_load, t_mD_store, mD_elems = self.OutputStationary(m,d,K,cycle_time, bw, debug)
             t_mn, t_mn_compute, t_mn_load, t_mn_store, mn_elems = self.OutputStationary(m,n,K,cycle_time, bw, debug)
-
-            T_total = math.floor(M/d)*math.floor(N/d)*t_DD + math.floor(M/d)*t_Dn + math.floor(N/d)*t_mD + t_mn
+           
+            
+            T_total = math.floor(M/d)*math.floor(N/d)*t_DD + math.floor(M/d)*t_Dn + math.floor(N/d)*t_mD + t_mn 
+            if debug:
+                print(f"{math.floor(M/d)*math.floor(N/d)} x t_DD: {t_DD} + {math.floor(M/d)} x t_Dn: {t_Dn} + {math.floor(N/d)} * t_mD: {t_mD} + t_mn: {t_mn} = {T_total}")
             T_compute = math.floor(M/d)*math.floor(N/d)*t_DD_compute + math.floor(M/d)*t_Dn_compute + math.floor(N/d)*t_mD_compute + t_mn_compute
             T_load = math.floor(M/d)*math.floor(N/d)*t_DD_load + math.floor(M/d)*t_Dn_load + math.floor(N/d)*t_mD_load + t_mn_load
             T_store = math.floor(M/d)*math.floor(N/d)*t_DD_store + math.floor(M/d)*t_Dn_store + math.floor(N/d)*t_mD_store + t_mn_store
