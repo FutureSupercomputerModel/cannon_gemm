@@ -281,7 +281,7 @@ def exp_normalize_area(gemm_dims):
             leaf_arch = arch
             while leaf_arch.child_arch is not None:
                 leaf_arch = leaf_arch.child_arch
-            print (f"{arch.name} Time: {time}, Time_compute: {log['Level 0 logs']['T_compute']*1E-9}, Energy: {energy}, E_compute: {log["E_compute"]}, E_memory:{log["E_memory"]}, E_interconnect:{log["E_interconnect"]}, E_interface:{log["E_SC_cryo_interface"]}, E_dyanmic:{log["E_dynamic"]}, E_static: {log["E_static"]}")
+            print (f"{arch.name} Time: {time}, Time_compute: {log['Level 0 logs']['T_compute']*1E-9}, Energy: {energy}, E_compute: {log['E_compute']}, E_memory:{log['E_memory']}, E_interconnect:{log['E_interconnect']}, E_interface:{log['E_SC_cryo_interface']}, E_dyanmic:{log['E_dynamic']}, E_static: {log['E_static']}")
             
             time_list.append(time)
             energy_list.append(energy)

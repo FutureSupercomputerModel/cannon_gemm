@@ -19,38 +19,48 @@ def lighten_color(color, amount=0.5):
     c = colorsys.rgb_to_hls(*mc.to_rgb(c))
     return colorsys.hls_to_rgb(c[0], 1 - amount * (1 - c[1]), c[2])
 
-def plot(table, gemm_dims, arch_names, latency_or_energy, ax, logscale = False, ylim=1):
+
+import numpy as np
+
+def plot(table, gemm_dims, arch_names, latency_or_energy, ax, logscale=False, ylim=1, show_wkld_names=True, rotate_xticks=False):
     normed_table = []
     for i in range(len(table)):
         normed_list = []
         for j in range(len(table[i])):
-            normed_list.append(table[i][j]/table[i][0])
+            normed_list.append(table[i][j] / table[i][0])
         normed_table.append(normed_list)
     normed_table = list(map(list, zip(*normed_table)))
-    # print (time_normed_table)
 
-    width = 1/1.3/len(arch_names)  # the width of the bars
+    width = 1 / 1.3 / len(arch_names)  # the width of the bars
     multiplier = 0
-    
+
     for arch_name, normed_list in zip(arch_names, normed_table):
-        ax.bar(np.arange(len(normed_list)) + multiplier*width, normed_list, width, label=arch_name)
+        ax.bar(np.arange(len(normed_list)) + multiplier * width, normed_list, width, label=arch_name)
         for i, normed in enumerate(normed_list):
             if not logscale and normed > ylim:
-                ax.text(i + multiplier*width, ylim,  f'{normed:.1f}', rotation=90, ha='center', va='top', size='small')
-            # elif normed >0.8:
-            #     ax.text(i + multiplier*width, normed,  f'{normed:.2f}', rotation=90, ha='center', va='top', size='small')
+                ax.text(i + multiplier * width, ylim, f'{normed:.1f}', rotation=90, ha='center', va='top', size='small')
             elif arch_name == "SCD":
-                ax.text(i + multiplier*width, normed,  f'{normed:.2f}', rotation=90, ha='center', va='bottom', size='small')
+                ax.text(i + multiplier * width, normed, f'{normed:.2f}', rotation=90, ha='center', va='bottom', size='small')
         multiplier += 1
-    # ax.set_ylabel(f'{latency_or_energy}_normed')
-    # ax.set_title(f'Normalized {latency_or_energy} for Different Architectures')
-    ax.set_xticks(np.arange(len(normed_list)) + width*(len(arch_names)-1)/2.0, gemm_dims)
-    # ax.legend(loc=(0.01,0.8), ncol = 3)
-    
+
+    # Control x-axis labels visibility based on show_wkld_names parameter
+    if show_wkld_names:
+        ax.set_xticks(np.arange(len(normed_list)) + width * (len(arch_names) - 1) / 2.0)
+        ax.set_xticklabels(gemm_dims)
+        
+        # Rotate x-ticks if rotate_xticks is True
+        if rotate_xticks:
+            ax.tick_params(axis='x', rotation=45)
+    else:
+        ax.set_xticks([])  # Remove tick marks
+        ax.set_xticklabels([])  # Remove tick labels
+
     if logscale:
         ax.set_yscale('log')
     else:
-        ax.set_ylim(0,ylim)
+        ax.set_ylim(0, ylim)
+
+
 
 def plot_2(table, table_compute, gemm_dims, arch_names, latency_or_energy, ax):
     normed_table = []

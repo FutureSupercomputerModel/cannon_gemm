@@ -15,6 +15,7 @@ arch_names = ["h100", "tpuv1", "tpuv4", "cryoE", "cryoP", "imec"]
 
 gemm_dims = [1024, 8192, 8192*8, 8192*64]
 
+gemm_dims = []
 time_table, energy_table = exp_normalize_area.exp_normalize_area()
 my_plot.plot(time_table, gemm_dims, arch_names,  "latency", ax[0], logscale=True)
 my_plot.plot(energy_table, gemm_dims, arch_names,  "energy", ax[1], logscale=True)
@@ -32,5 +33,5 @@ title = fig.suptitle('Normalized Latency and Energy \nfor Different Architecture
 # fig.tight_layout()
 plt.savefig("fig_comparative_study_iso_area.pdf", bbox_extra_artists=(lgd,label0, label1, title, ), bbox_inches='tight')
 
-
+plt.savefig("fig_comparative_study_iso_area.png", bbox_extra_artists=(lgd,label0, label1, title, ), bbox_inches='tight')
 plt.close('all')
